@@ -19,8 +19,8 @@ const mockAsyncIterableIterator = () => {
     },
   ]
   return async function* documents() {
-    for (let index = 0; index < data.length; index++) {
-      yield data[index]
+    for (const doc of data) {
+      yield doc
     }
   }
 }

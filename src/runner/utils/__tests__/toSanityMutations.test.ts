@@ -111,7 +111,7 @@ describe('#toSanityMutations', () => {
     }
 
     const expected: TransactionPayload = {
-      transactionId: mockTransaction.id,
+      ...(mockTransaction.id !== undefined && {transactionId: mockTransaction.id}),
       mutations: SanityEncoder.encodeAll(mockTransaction.mutations as any[]),
     }
 

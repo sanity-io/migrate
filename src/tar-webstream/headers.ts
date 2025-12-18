@@ -55,7 +55,7 @@ export function decode(
   filenameEncoding: BufferEncoding,
   allowUnknownFormat: boolean,
 ): TarHeader | null {
-  let typeflag = buf[156] === 0 ? 0 : buf[156] - ZERO_OFFSET
+  let typeflag = buf[156] === 0 ? 0 : buf[156]! - ZERO_OFFSET
 
   let name = decodeStr(buf, 0, 100, filenameEncoding)
   const mode = decodeOct(buf, 100, 8)
@@ -171,8 +171,8 @@ function indexOf(block: Uint8Array, num: number, offset: number, end: number) {
 
 function cksum(block: Uint8Array) {
   let sum = 8 * 32
-  for (let i = 0; i < 148; i++) sum += block[i]
-  for (let j = 156; j < 512; j++) sum += block[j]
+  for (let i = 0; i < 148; i++) sum += block[i]!
+  for (let j = 156; j < 512; j++) sum += block[j]!
   return sum
 }
 
@@ -193,7 +193,7 @@ function parse256(buf: Uint8Array) {
   const tuple = []
   let i
   for (i = buf.length - 1; i > 0; i--) {
-    const byte = buf[i]
+    const byte = buf[i]!
     if (positive) tuple.push(byte)
     else tuple.push(0xff - byte)
   }
@@ -201,7 +201,7 @@ function parse256(buf: Uint8Array) {
   let sum = 0
   const l = tuple.length
   for (i = 0; i < l; i++) {
-    sum += tuple[i] * Math.pow(256, i)
+    sum += tuple[i]! * Math.pow(256, i)
   }
 
   return positive ? sum : -1 * sum
@@ -212,7 +212,7 @@ const getCachedDecoder = (encoding: string) => {
   if (!(encoding in decoders)) {
     decoders[encoding] = new TextDecoder(encoding)
   }
-  return decoders[encoding]
+  return decoders[encoding]!
 }
 
 function toString(uint8: Uint8Array, encoding = 'utf-8') {
@@ -223,13 +223,13 @@ function decodeOct(val: Uint8Array, offset: number, length: number) {
   val = val.subarray(offset, offset + length)
   offset = 0
   // If prefixed with 0x80 then parse as a base-256 integer
-  if (val[offset] & 0x80) {
+  if (val[offset]! & 0x80) {
     return parse256(val)
   }
   // Older versions of tar can prefix with spaces
   while (offset < val.length && val[offset] === 32) offset++
   const end = clamp(indexOf(val, 32, offset, val.length), val.length, val.length)
-  while (offset < end && val[offset] === 0) offset++
+  while (offset < end && val[offset]! === 0) offset++
   if (end === offset) return 0
   return parseInt(toString(val.subarray(offset, end)), 8)
 }

@@ -76,7 +76,10 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
     parse<SanityDocument>(
       decodeText(
         streamToAsyncIterator(
-          await fromExportEndpoint({...config.api, documentTypes: migration.documentTypes}),
+          await fromExportEndpoint({
+            ...config.api,
+            ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
+          }),
         ),
       ),
       {parse: safeJsonParser},

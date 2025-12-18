@@ -31,12 +31,32 @@ export default defineConfig(
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
       '@typescript-eslint/no-unsafe-call': 'warn',
       '@typescript-eslint/no-unsafe-return': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-dupe-class-members': 'error',
+      '@typescript-eslint/no-redeclare': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-useless-constructor': 'error',
+      '@typescript-eslint/no-var-requires': 'off',
+      'no-dupe-class-members': 'off',
+      'no-redeclare': 'off',
+      'no-unused-expressions': 'off',
+      'no-unused-vars': 'off',
+      'no-useless-constructor': 'off',
+    },
+  },
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   {

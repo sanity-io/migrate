@@ -7,23 +7,15 @@ function isSystemDocumentId(id: string) {
   return id.startsWith('_.')
 }
 
-async function* filterDocumentTypes(
-  documents: AsyncIterableIterator<SanityDocument>,
-  types: string[],
-) {
-  for await (const doc of documents) {
-    if (types.includes(doc._type)) {
-      yield doc
-    }
-  }
-}
-
 function parseGroqFilter(filter: string) {
   try {
     return parse(`*[${filter}]`)
   } catch (err) {
-    err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
-    throw err
+    if (err instanceof Error) {
+      err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
+      throw err
+    }
+    throw new Error(`Failed to parse GROQ filter "${filter}": ${String(err)}`)
   }
 }
 

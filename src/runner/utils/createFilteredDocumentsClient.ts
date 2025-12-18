@@ -24,7 +24,7 @@ export function createFilteredDocumentsClient(
       }
       if (remaining === 0) break
     }
-    return ids.map((id) => found[id])
+    return ids.map((id) => found[id]).filter((item): item is T => item !== undefined)
   }
 
   async function getDocumentFromBuffer<T extends SanityDocument>(

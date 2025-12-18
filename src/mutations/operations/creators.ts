@@ -233,7 +233,7 @@ export function truncate(startIndex: number, endIndex?: number): TruncateOp {
   return {
     type: 'truncate',
     startIndex,
-    endIndex,
+    ...(endIndex !== undefined && {endIndex}),
   }
 }
 

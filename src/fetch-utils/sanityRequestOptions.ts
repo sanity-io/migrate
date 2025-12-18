@@ -6,7 +6,7 @@ import {type FetchOptions} from './fetchStream.js'
 const require = createRequire(import.meta.url)
 
 function getUserAgent() {
-  if (typeof window === 'undefined') {
+  if (typeof (globalThis as any).window === 'undefined') {
     // only set UA if we're in a non-browser environment
     try {
       const pkg = require('../../package.json')
@@ -38,7 +38,7 @@ export function toFetchOptions(req: SanityRequestOptions): FetchOptions {
     headers: {
       'Content-Type': 'application/json',
     },
-    body,
+    ...(body !== undefined && {body}),
   }
   const ua = getUserAgent()
   if (ua) {

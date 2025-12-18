@@ -12,14 +12,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 async function* extract(file: string) {
   const fileStream = readFileAsWebStream(file)
   for await (const [header, body] of streamToAsyncIterator(untar(fileStream))) {
-    yield [header.name, streamToAsyncIterator(body)]
+    if (body) {
+      yield [header.name, streamToAsyncIterator(body)]
+    }
   }
 }
 
 test('untar an empty tar file', async () => {
   await expect(async () => {
     for await (const [, body] of extract(`${__dirname}/fixtures/empty.tar`)) {
-      for await (const chunk of body) {
+      for await (const _chunk of body!) {
         // should throw before reaching here
       }
     }
@@ -31,7 +33,7 @@ test('untar an empty tar file', async () => {
 test('untar an invalid tar file of > 512b', async () => {
   await expect(async () => {
     for await (const [, body] of extract(`${__dirname}/fixtures/invalid.tar`)) {
-      for await (const chunk of body) {
+      for await (const _chunk of body!) {
         // should throw before reaching here
       }
     }
@@ -43,7 +45,7 @@ test('untar an invalid tar file of > 512b', async () => {
 test('untar a corrupted tar file', async () => {
   await expect(async () => {
     for await (const [, body] of extract(`${__dirname}/fixtures/corrupted.tar`)) {
-      for await (const chunk of body) {
+      for await (const _chunk of body!) {
         // should throw before reaching here
       }
     }

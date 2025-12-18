@@ -17,7 +17,7 @@ export async function* toSanityMutations(
     for (const mut of arrify(mutation)) {
       if (isTransaction(mut)) {
         yield {
-          transactionId: mut.id,
+          ...(mut.id !== undefined && {transactionId: mut.id}),
           mutations: SanityEncoder.encodeAll(mut.mutations as any[]),
         }
         continue

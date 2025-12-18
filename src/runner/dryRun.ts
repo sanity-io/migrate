@@ -23,7 +23,10 @@ export async function* dryRun(config: MigrationRunnerOptions, migration: Migrati
   const source = config.exportPath
     ? fromExportArchive(config.exportPath)
     : streamToAsyncIterator(
-        await fromExportEndpoint({...config.api, documentTypes: migration.documentTypes}),
+        await fromExportEndpoint({
+          ...config.api,
+          ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
+        }),
       )
 
   const filteredDocuments = applyFilters(

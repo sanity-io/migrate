@@ -7,8 +7,11 @@ function parseGroq(query: string) {
   try {
     return parse(query)
   } catch (err) {
-    err.message = `Failed to parse GROQ filter "${query}": ${err.message}`
-    throw err
+    if (err instanceof Error) {
+      err.message = `Failed to parse GROQ filter "${query}": ${err.message}`
+      throw err
+    }
+    throw new Error(`Failed to parse GROQ filter "${query}": ${String(err)}`)
   }
 }
 
@@ -19,5 +22,5 @@ export async function groqQuery<T>(
 ): Promise<T> {
   const parsedFilter = parseGroq(query)
   const all = await toArray(it)
-  return (await evaluate(parsedFilter, {dataset: all, params})).get()
+  return (await evaluate(parsedFilter, {dataset: all, ...(params !== undefined && {params})})).get()
 }

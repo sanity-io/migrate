@@ -6,8 +6,11 @@ function parseGroqFilter(filter: string) {
   try {
     return parse(`*[${filter}]`)
   } catch (err) {
-    err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
-    throw err
+    if (err instanceof Error) {
+      err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
+      throw err
+    }
+    throw new Error(`Failed to parse GROQ filter "${filter}": ${String(err)}`)
   }
 }
 

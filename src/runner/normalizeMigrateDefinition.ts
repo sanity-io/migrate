@@ -29,8 +29,8 @@ export function normalizeMigrateDefinition(migration: Migration): AsyncIterableM
     return normalizeIteratorValues(migration.migrate)
   }
   return createAsyncIterableMutation(migration.migrate, {
-    filter: migration.filter,
-    documentTypes: migration.documentTypes,
+    ...(migration.filter !== undefined && {filter: migration.filter}),
+    ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
   })
 }
 

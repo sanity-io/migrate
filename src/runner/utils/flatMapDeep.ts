@@ -34,9 +34,11 @@ type MapFn<T> = (value: JsonValue, path: Path) => T | T[]
 function mapObject<T>(reducerFn: MapFn<T>, object: JsonObject, path: Path): T[] {
   return [
     ...callMap(reducerFn, object, path),
-    ...Object.keys(object).flatMap((key) =>
-      flatMapAny(reducerFn, object[key], path.concat(getPathWithKey(object[key], key, object))),
-    ),
+    ...Object.keys(object).flatMap((key) => {
+      const value = object[key]
+      if (value === undefined) return []
+      return flatMapAny(reducerFn, value, path.concat(getPathWithKey(value, key, object)))
+    }),
   ]
 }
 
