@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import {createRequire} from 'node:module'
 
 import {type Endpoint} from './endpoints.js'

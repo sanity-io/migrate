@@ -9,7 +9,6 @@ import {type Mutation, type Transaction} from '../../../mutations/index.js'
 import {toSanityMutations, type TransactionPayload} from '../toSanityMutations.js'
 
 vitest.mock('@sanity/mutate', async () => {
-   
   const actual = await vitest.importActual<typeof import('@sanity/mutate')>('@sanity/mutate')
   return {
     ...actual,

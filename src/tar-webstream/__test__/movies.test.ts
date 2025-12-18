@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import {webcrypto} from 'node:crypto'
 import path from 'node:path'
 import {fileURLToPath} from 'node:url'
@@ -23,7 +22,7 @@ function getCrypto() {
 
 async function shasum(data: Uint8Array) {
   const {subtle} = getCrypto()
-  const digest = await subtle.digest('SHA-256', data)
+  const digest = await subtle.digest('SHA-256', data.buffer as ArrayBuffer)
   return hex(new Uint8Array(digest))
 }
 function hex(data: Uint8Array) {
@@ -40,7 +39,7 @@ test('untar movies dataset export', async () => {
 
   for await (const [header, body] of streamToAsyncIterator(untar(fileStream))) {
     if (header.name.includes(file)) {
-      const chunks = await toArray(streamToAsyncIterator(body))
+      const chunks = await toArray<Uint8Array>(streamToAsyncIterator(body))
       const sum = await shasum(concatUint8Arrays(chunks))
       expect(sum).toEqual('02c936cda5695fa4f43f5dc919c1f55c362faa6dd558dfb2d77d524f004069db')
     } else {

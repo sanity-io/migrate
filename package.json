@@ -42,6 +42,7 @@
   "scripts": {
     "_postbuild": "oclif manifest",
     "build": "swc src -d dist --strip-leading-paths && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "clean": "rimraf dist node_modules",
     "coverage": "vitest run --coverage",
     "dev": "tsc --watch",
     "format": "prettier --write .",
@@ -83,6 +84,7 @@
     "@swc/core": "^1.15.5",
     "@types/debug": "^4.1.12",
     "@types/node": "^25.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
     "eslint": "9.39.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-sanity": "^7.1.4",
@@ -96,6 +98,7 @@
     "typescript-eslint": "^8.50.0",
     "vitest": "^4.0.16"
   },
+  "packageManager": "pnpm@10.26.0",
   "engines": {
     "node": ">=20.19 <22 || >=22.12"
   }

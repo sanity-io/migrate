@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
 export interface FetchOptions {
@@ -7,10 +6,12 @@ export interface FetchOptions {
 }
 
 interface ErrorResponse {
-  error?: {
-    type?: string
-    description?: string
-  } | string
+  error?:
+    | {
+        type?: string
+        description?: string
+      }
+    | string
   message?: string
 }
 
