@@ -1,6 +1,6 @@
 import arrify from 'arrify'
 
-import {type AnyArray, type ArrayElement, type NormalizeReadOnlyArray} from '../typeUtils'
+import {type AnyArray, type ArrayElement, type NormalizeReadOnlyArray} from '../typeUtils.js'
 import {
   type DecOp,
   type DiffMatchPatchOp,
@@ -14,7 +14,7 @@ import {
   type SetOp,
   type TruncateOp,
   type UnsetOp,
-} from './types'
+} from './types.js'
 
 /**
  * Creates a `set` operation with the provided value.

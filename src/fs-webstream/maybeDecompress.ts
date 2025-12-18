@@ -1,4 +1,4 @@
-import {peekInto} from './peekInto'
+import {peekInto} from './peekInto.js'
 
 function isGzip(buffer: Uint8Array) {
   return buffer.length > 3 && buffer[0] === 0x1f && buffer[1] === 0x8b && buffer[2] === 0x08

@@ -2,8 +2,8 @@ import {type Mutation as SanityMutation} from '@sanity/client'
 import {SanityEncoder} from '@sanity/mutate'
 import arrify from 'arrify'
 
-import {type Mutation, type Transaction} from '../../mutations'
-import {isTransaction} from '../../mutations/asserters'
+import {isTransaction} from '../../mutations/asserters.js'
+import {type Mutation, type Transaction} from '../../mutations/index.js'
 
 export interface TransactionPayload {
   transactionId?: string
@@ -18,12 +18,12 @@ export async function* toSanityMutations(
       if (isTransaction(mut)) {
         yield {
           transactionId: mut.id,
-          mutations: SanityEncoder.encodeAll(mut.mutations as any[]) as SanityMutation[],
+          mutations: SanityEncoder.encodeAll(mut.mutations as any[]),
         }
         continue
       }
 
-      yield SanityEncoder.encodeAll(arrify(mut) as any[]) as SanityMutation[]
+      yield SanityEncoder.encodeAll(arrify(mut) as any[])
     }
   }
 }

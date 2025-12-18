@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest'
 
-import {at, create, createIfNotExists, createOrReplace, del, patch} from '../creators'
-import {inc, insert, set, setIfMissing, unset} from '../operations/creators'
+import {at, create, createIfNotExists, createOrReplace, del, patch} from '../creators.js'
+import {inc, insert, set, setIfMissing, unset} from '../operations/creators.js'
 
 test('single patch mutation', () => {
   expect(patch('cat', at(['title'], set('hello world')))).toStrictEqual({

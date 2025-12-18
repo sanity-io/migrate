@@ -1,7 +1,7 @@
 import {type Path} from '@sanity/types'
 
-import {type Operation} from './operations/types'
-import {type Optional} from './typeUtils'
+import {type Operation} from './operations/types.js'
+import {type Optional} from './typeUtils.js'
 
 /**
  * @public

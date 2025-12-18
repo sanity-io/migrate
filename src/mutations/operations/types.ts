@@ -1,6 +1,6 @@
 import {type KeyedSegment} from '@sanity/types'
 
-import {type AnyArray} from '../typeUtils'
+import {type AnyArray} from '../typeUtils.js'
 
 /**
  * @public

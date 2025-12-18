@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest'
 
-import {parseJSON} from '../json'
+import {parseJSON} from '../json.js'
 
 test('parse JSON', async () => {
   const gen = async function* () {

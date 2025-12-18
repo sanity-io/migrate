@@ -1,12 +1,12 @@
 import {type MultipleMutationResult, type Mutation as RawMutation} from '@sanity/client'
 import {type Path, type SanityDocument} from '@sanity/types'
 
-import {type JsonArray, type JsonObject, type JsonValue} from './json'
-import {type Mutation, type NodePatch, type Operation, type Transaction} from './mutations'
-import {type RestrictedClient} from './runner/utils/createContextClient'
+import {type JsonArray, type JsonObject, type JsonValue} from './json.js'
+import {type Mutation, type NodePatch, type Operation, type Transaction} from './mutations/index.js'
+import {type RestrictedClient} from './runner/utils/createContextClient.js'
 
 export type {Path}
-export type * from './json'
+export type * from './json.js'
 
 export type AsyncIterableMigration = (
   documents: () => AsyncIterableIterator<SanityDocument>,

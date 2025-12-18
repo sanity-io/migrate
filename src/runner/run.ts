@@ -2,37 +2,37 @@ import {type MultipleMutationResult} from '@sanity/client'
 import {type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
 
-import {endpoints} from '../fetch-utils/endpoints'
-import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream'
-import {toFetchOptions} from '../fetch-utils/sanityRequestOptions'
-import {bufferThroughFile} from '../fs-webstream/bufferThroughFile'
-import {decodeText, parseJSON} from '../it-utils'
-import {concatStr} from '../it-utils/concatStr'
-import {lastValueFrom} from '../it-utils/lastValueFrom'
-import {mapAsync} from '../it-utils/mapAsync'
-import {parse, stringify} from '../it-utils/ndjson'
-import {tap} from '../it-utils/tap'
-import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint'
+import {endpoints} from '../fetch-utils/endpoints.js'
+import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
+import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
+import {bufferThroughFile} from '../fs-webstream/bufferThroughFile.js'
+import {concatStr} from '../it-utils/concatStr.js'
+import {decodeText, parseJSON} from '../it-utils/index.js'
+import {lastValueFrom} from '../it-utils/lastValueFrom.js'
+import {mapAsync} from '../it-utils/mapAsync.js'
+import {parse, stringify} from '../it-utils/ndjson.js'
+import {tap} from '../it-utils/tap.js'
+import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint.js'
 import {
   type APIConfig,
   type Migration,
   type MigrationContext,
   type MigrationProgress,
-} from '../types'
-import {asyncIterableToStream} from '../utils/asyncIterableToStream'
-import {streamToAsyncIterator} from '../utils/streamToAsyncIterator'
-import {collectMigrationMutations} from './collectMigrationMutations'
+} from '../types.js'
+import {asyncIterableToStream} from '../utils/asyncIterableToStream.js'
+import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
+import {collectMigrationMutations} from './collectMigrationMutations.js'
 import {
   DEFAULT_MUTATION_CONCURRENCY,
   MAX_MUTATION_CONCURRENCY,
   MUTATION_ENDPOINT_MAX_BODY_SIZE,
-} from './constants'
-import {applyFilters} from './utils/applyFilters'
-import {batchMutations} from './utils/batchMutations'
-import {createContextClient} from './utils/createContextClient'
-import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient'
-import {createBufferFile} from './utils/getBufferFile'
-import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations'
+} from './constants.js'
+import {applyFilters} from './utils/applyFilters.js'
+import {batchMutations} from './utils/batchMutations.js'
+import {createContextClient} from './utils/createContextClient.js'
+import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient.js'
+import {createBufferFile} from './utils/getBufferFile.js'
+import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations.js'
 
 export interface MigrationRunnerConfig {
   api: APIConfig

@@ -1,12 +1,12 @@
 import {type SanityDocument} from '@sanity/types'
 import {describe, expect, it, vitest} from 'vitest'
 
-import {createIfNotExists} from '../../mutations'
-import {type Migration, type MigrationContext, type NodeMigration} from '../../types'
+import {createIfNotExists} from '../../mutations/index.js'
+import {type Migration, type MigrationContext, type NodeMigration} from '../../types.js'
 import {
   createAsyncIterableMutation,
   normalizeMigrateDefinition,
-} from '../normalizeMigrateDefinition'
+} from '../normalizeMigrateDefinition.js'
 
 const mockAsyncIterableIterator = () => {
   const data: SanityDocument[] = [

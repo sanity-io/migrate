@@ -2,7 +2,7 @@ import {type Path} from '@sanity/types'
 import {fromString} from '@sanity/util/paths'
 import arrify from 'arrify'
 
-import {type Operation} from './operations/types'
+import {type Operation} from './operations/types.js'
 import {
   type CreateIfNotExistsMutation,
   type CreateMutation,
@@ -13,8 +13,8 @@ import {
   type PatchMutation,
   type PatchOptions,
   type SanityDocument,
-} from './types'
-import {type NormalizeReadOnlyArray, type Optional, type Tuplify} from './typeUtils'
+} from './types.js'
+import {type NormalizeReadOnlyArray, type Optional, type Tuplify} from './typeUtils.js'
 
 /**
  * Creates a new document.

@@ -3,9 +3,9 @@ import {fileURLToPath} from 'node:url'
 
 import {expect, test} from 'vitest'
 
-import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream'
-import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator'
-import {untar} from '../untar'
+import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream.js'
+import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
+import {untar} from '../untar.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

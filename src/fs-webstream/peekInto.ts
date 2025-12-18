@@ -1,4 +1,4 @@
-import {concatUint8Arrays} from '../uint8arrays'
+import {concatUint8Arrays} from '../uint8arrays/index.js'
 
 export function peekInto(readable: ReadableStream, options: {size: number}) {
   const {size} = options

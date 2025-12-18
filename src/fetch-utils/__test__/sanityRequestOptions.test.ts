@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest'
 
-import {endpoints} from '../endpoints'
-import {toFetchOptions} from '../sanityRequestOptions'
+import {endpoints} from '../endpoints.js'
+import {toFetchOptions} from '../sanityRequestOptions.js'
 
 test('toFetchOptions', () => {
   expect(

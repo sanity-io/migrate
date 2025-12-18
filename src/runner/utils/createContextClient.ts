@@ -1,6 +1,6 @@
 import {createClient, type SanityClient} from '@sanity/client'
 
-import {limitClientConcurrency} from './limitClientConcurrency'
+import {limitClientConcurrency} from './limitClientConcurrency.js'
 
 export function createContextClient(config: Parameters<typeof createClient>[0]): RestrictedClient {
   return restrictClient(

@@ -1,7 +1,7 @@
 import {type SanityDocument} from '@sanity/types'
 import {evaluate, type ExprNode, parse} from 'groq-js'
 
-import {type Migration} from '../../types'
+import {type Migration} from '../../types.js'
 
 function isSystemDocumentId(id: string) {
   return id.startsWith('_.')

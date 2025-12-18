@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest'
 
-import {assert2xx} from '../fetchStream'
+import {assert2xx} from '../fetchStream.js'
 
 test('server responds with 2xx', async () => {
   const mockResponse = {

@@ -3,12 +3,12 @@ import {fileURLToPath} from 'node:url'
 
 import {expect, test} from 'vitest'
 
-import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream'
-import {toArray} from '../../it-utils/toArray'
-import {concatUint8Arrays} from '../../uint8arrays'
-import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator'
-import {drain} from '../drain'
-import {untar} from '../untar'
+import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream.js'
+import {toArray} from '../../it-utils/toArray.js'
+import {concatUint8Arrays} from '../../uint8arrays/index.js'
+import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
+import {drain} from '../drain.js'
+import {untar} from '../untar.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

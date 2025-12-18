@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
-import {BufferList} from './BufferList'
-import * as headers from './headers'
-import {type TarHeader} from './headers'
+import {ReadableStream} from 'node:stream/web'
+
+import {BufferList} from './BufferList.js'
+import * as headers from './headers.js'
+import {type TarHeader} from './headers.js'
 
 // Inspired by
 // - https://github.com/alanshaw/it-tar/blob/master/src/extract.ts

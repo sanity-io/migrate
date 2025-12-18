@@ -4,12 +4,12 @@ import {fileURLToPath} from 'node:url'
 
 import {describe, expect, test} from 'vitest'
 
-import {decodeText, parse} from '../../it-utils'
-import {firstValueFrom} from '../../it-utils/firstValueFrom'
-import {lastValueFrom} from '../../it-utils/lastValueFrom'
-import {asyncIterableToStream} from '../../utils/asyncIterableToStream'
-import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator'
-import {bufferThroughFile} from '../bufferThroughFile'
+import {firstValueFrom} from '../../it-utils/firstValueFrom.js'
+import {decodeText, parse} from '../../it-utils/index.js'
+import {lastValueFrom} from '../../it-utils/lastValueFrom.js'
+import {asyncIterableToStream} from '../../utils/asyncIterableToStream.js'
+import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
+import {bufferThroughFile} from '../bufferThroughFile.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

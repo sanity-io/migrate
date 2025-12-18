@@ -1,7 +1,7 @@
 import {type SanityDocument} from '@sanity/types'
 
-import {type Migration, type MigrationContext} from '../types'
-import {normalizeMigrateDefinition} from './normalizeMigrateDefinition'
+import {type Migration, type MigrationContext} from '../types.js'
+import {normalizeMigrateDefinition} from './normalizeMigrateDefinition.js'
 
 function wrapDocumentsIteratorProducer(factory: () => AsyncIterableIterator<SanityDocument>) {
   function documents() {

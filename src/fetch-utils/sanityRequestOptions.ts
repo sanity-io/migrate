@@ -1,7 +1,7 @@
 import {createRequire} from 'node:module'
 
-import {type Endpoint} from './endpoints'
-import {type FetchOptions} from './fetchStream'
+import {type Endpoint} from './endpoints.js'
+import {type FetchOptions} from './fetchStream.js'
 
 const require = createRequire(import.meta.url)
 

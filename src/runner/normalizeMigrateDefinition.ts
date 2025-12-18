@@ -3,7 +3,8 @@ import {SanityEncoder} from '@sanity/mutate'
 import {type Path, type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
 
-import {type JsonArray, type JsonObject, type JsonValue} from '../json'
+import {type JsonArray, type JsonObject, type JsonValue} from '../json.js'
+import {isMutation, isNodePatch, isOperation, isTransaction} from '../mutations/asserters.js'
 import {
   at,
   type Mutation,
@@ -11,17 +12,16 @@ import {
   type Operation,
   patch,
   type Transaction,
-} from '../mutations'
-import {isMutation, isNodePatch, isOperation, isTransaction} from '../mutations/asserters'
+} from '../mutations/index.js'
 import {
   type AsyncIterableMigration,
   type Migration,
   type MigrationContext,
   type NodeMigration,
   type NodeMigrationReturnValue,
-} from '../types'
-import {flatMapDeep} from './utils/flatMapDeep'
-import {getValueType} from './utils/getValueType'
+} from '../types.js'
+import {flatMapDeep} from './utils/flatMapDeep.js'
+import {getValueType} from './utils/getValueType.js'
 
 export function normalizeMigrateDefinition(migration: Migration): AsyncIterableMigration {
   if (typeof migration.migrate == 'function') {

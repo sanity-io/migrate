@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest'
 
-import {toArray} from '../../../it-utils'
-import {batchMutations} from '../batchMutations'
+import {toArray} from '../../../it-utils/index.js'
+import {batchMutations} from '../batchMutations.js'
 
 function byteLength(obj: unknown) {
   return JSON.stringify(obj).length

@@ -1,6 +1,6 @@
 import {evaluate, type ExprNode, parse} from 'groq-js'
 
-import {filter as filterIt} from './filter'
+import {filter as filterIt} from './filter.js'
 
 function parseGroqFilter(filter: string) {
   try {

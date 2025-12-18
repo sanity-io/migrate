@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest'
 
-import {split} from '../split'
+import {split} from '../split.js'
 
 test('split multiple chunks by newline', async () => {
   const gen = async function* () {

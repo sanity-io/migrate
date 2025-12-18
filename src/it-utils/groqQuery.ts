@@ -1,7 +1,7 @@
 import {type SanityDocument} from '@sanity/types'
 import {evaluate, parse} from 'groq-js'
 
-import {toArray} from './toArray'
+import {toArray} from './toArray.js'
 
 function parseGroq(query: string) {
   try {
