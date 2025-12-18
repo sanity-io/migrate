@@ -16,6 +16,7 @@ import {createBufferFile} from './utils/getBufferFile.js'
 
 interface MigrationRunnerOptions {
   api: APIConfig
+
   exportPath?: string
 }
 
@@ -48,8 +49,8 @@ export async function* dryRun(config: MigrationRunnerOptions, migration: Migrati
   const filteredDocumentsClient = createFilteredDocumentsClient(createReader)
   const context: MigrationContext = {
     client,
-    filtered: filteredDocumentsClient,
     dryRun: true,
+    filtered: filteredDocumentsClient,
   }
 
   yield* collectMigrationMutations(

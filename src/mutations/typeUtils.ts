@@ -6,7 +6,8 @@ export type NormalizeReadOnlyArray<T> = T extends readonly [infer NP, ...infer R
     ? NP[]
     : T
 
-export type AnyArray<T = any> = T[] | readonly T[]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic utility type that needs to accept any type
+export type AnyArray<T = any> = readonly T[] | T[]
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 

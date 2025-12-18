@@ -36,6 +36,7 @@ import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutati
 
 export interface MigrationRunnerConfig {
   api: APIConfig
+
   concurrency?: number
   onProgress?: (event: MigrationProgress) => void
 }
@@ -46,29 +47,29 @@ export async function* toFetchOptionsIterable(
 ) {
   for await (const transaction of mutations) {
     yield toFetchOptions({
-      projectId: apiConfig.projectId,
-      apiVersion: apiConfig.apiVersion,
-      token: apiConfig.token,
-      tag: 'sanity.migration.mutate',
       apiHost: apiConfig.apiHost ?? 'api.sanity.io',
+      apiVersion: apiConfig.apiVersion,
+      body: JSON.stringify(transaction),
       endpoint: endpoints.data.mutate(apiConfig.dataset, {
+        autoGenerateArrayKeys: true,
         returnIds: true,
         visibility: 'async',
-        autoGenerateArrayKeys: true,
       }),
-      body: JSON.stringify(transaction),
+      projectId: apiConfig.projectId,
+      tag: 'sanity.migration.mutate',
+      token: apiConfig.token,
     })
   }
 }
 
 export async function run(config: MigrationRunnerConfig, migration: Migration) {
   const stats: MigrationProgress = {
+    completedTransactions: [],
+    currentTransactions: [],
     documents: 0,
     mutations: 0,
     pending: 0,
     queuedBatches: 0,
-    completedTransactions: [],
-    currentTransactions: [],
   }
 
   const filteredDocuments = applyFilters(
@@ -95,15 +96,15 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
 
   const client = createContextClient({
     ...config.api,
-    useCdn: false,
     requestTagPrefix: 'sanity.migration',
+    useCdn: false,
   })
 
   const filteredDocumentsClient = createFilteredDocumentsClient(createReader)
   const context: MigrationContext = {
     client,
-    filtered: filteredDocumentsClient,
     dryRun: false,
+    filtered: filteredDocumentsClient,
   }
 
   const documents = () =>

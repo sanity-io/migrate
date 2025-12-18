@@ -24,7 +24,7 @@ import {type NormalizeReadOnlyArray, type Optional, type Tuplify} from './typeUt
 export function create<Doc extends Optional<SanityDocument, '_id'>>(
   document: Doc,
 ): CreateMutation<Doc> {
-  return {type: 'create', document}
+  return {document, type: 'create'}
 }
 
 /**
@@ -34,15 +34,16 @@ export function create<Doc extends Optional<SanityDocument, '_id'>>(
  * @param options - Optional patch options.
  * @returns The mutation to patch the document.
  */
-export function patch<P extends NodePatchList | NodePatch>(
+export function patch<P extends NodePatch | NodePatchList>(
   id: string,
   patches: P,
   options?: PatchOptions,
 ): PatchMutation<NormalizeReadOnlyArray<Tuplify<P>>> {
   return {
-    type: 'patch',
     id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- arrify loses type information, cast needed for tuple type preservation
     patches: arrify(patches) as any,
+    type: 'patch',
     ...(options ? {options} : {}),
   }
 }
@@ -55,8 +56,8 @@ export function patch<P extends NodePatchList | NodePatch>(
  */
 export function at<O extends Operation>(path: Path | string, operation: O): NodePatch<Path, O> {
   return {
-    path: typeof path === 'string' ? fromString(path) : path,
     op: operation,
+    path: typeof path === 'string' ? fromString(path) : path,
   }
 }
 
@@ -68,7 +69,7 @@ export function at<O extends Operation>(path: Path | string, operation: O): Node
 export function createIfNotExists<Doc extends SanityDocument>(
   document: Doc,
 ): CreateIfNotExistsMutation<Doc> {
-  return {type: 'createIfNotExists', document}
+  return {document, type: 'createIfNotExists'}
 }
 
 /**
@@ -79,7 +80,7 @@ export function createIfNotExists<Doc extends SanityDocument>(
 export function createOrReplace<Doc extends SanityDocument>(
   document: Doc,
 ): CreateOrReplaceMutation<Doc> {
-  return {type: 'createOrReplace', document}
+  return {document, type: 'createOrReplace'}
 }
 
 /**
@@ -88,7 +89,7 @@ export function createOrReplace<Doc extends SanityDocument>(
  * @returns The mutation operation to delete the document.
  */
 export function delete_(id: string): DeleteMutation {
-  return {type: 'delete', id}
+  return {id, type: 'delete'}
 }
 
 /**

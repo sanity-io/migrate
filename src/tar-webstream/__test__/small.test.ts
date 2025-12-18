@@ -15,7 +15,7 @@ async function* extract(file: string) {
   const fileStream = readFileAsWebStream(file)
   for await (const [header, body] of streamToAsyncIterator(untar(fileStream))) {
     const content = await toArray(decodeText(streamToAsyncIterator(body)))
-    yield [header.name, {type: header.type, content}]
+    yield [header.name, {content, type: header.type}]
   }
 }
 

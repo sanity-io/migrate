@@ -6,10 +6,10 @@ import {toFetchOptions} from '../sanityRequestOptions.js'
 test('toFetchOptions', () => {
   expect(
     toFetchOptions({
-      projectId: 'xyz',
-      apiVersion: 'v2025-01-31',
       apiHost: 'api.sanity.io',
+      apiVersion: 'v2025-01-31',
       endpoint: endpoints.data.query('my-dataset'),
+      projectId: 'xyz',
     }),
   ).toEqual({
     init: {

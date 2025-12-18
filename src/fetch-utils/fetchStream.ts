@@ -1,17 +1,17 @@
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
 export interface FetchOptions {
-  url: string | URL
   init: RequestInit
+  url: string | URL
 }
 
 interface ErrorResponse {
   error?:
-    | {
-        type?: string
-        description?: string
-      }
     | string
+    | {
+        description?: string
+        type?: string
+      }
   message?: string
 }
 
@@ -33,11 +33,9 @@ export async function assert2xx(res: Response): Promise<void> {
 
     if (jsonResponse?.error) {
       if (typeof jsonResponse.error === 'object') {
-        if (jsonResponse.error.description) {
-          message = `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
-        } else {
-          message = `${jsonResponse.error.type || res.status}: ${jsonResponse.message || 'Unknown error'}`
-        }
+        message = jsonResponse.error.description
+          ? `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
+          : `${jsonResponse.error.type || res.status}: ${jsonResponse.message || 'Unknown error'}`
       } else {
         message = `${jsonResponse.error}: ${jsonResponse.message || ''}`
       }
@@ -49,7 +47,7 @@ export async function assert2xx(res: Response): Promise<void> {
   }
 }
 
-export async function fetchStream({url, init}: FetchOptions) {
+export async function fetchStream({init, url}: FetchOptions) {
   const response = await fetch(url, init)
   await assert2xx(response)
   if (response.body === null) throw new Error('No response received')

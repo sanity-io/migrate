@@ -14,9 +14,11 @@ import {untar} from '../untar.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function getCrypto() {
-  if (typeof globalThis.crypto === 'undefined') {
+  // eslint-disable-next-line n/no-unsupported-features/node-builtins
+  if (globalThis.crypto === undefined) {
     return webcrypto
   }
+  // eslint-disable-next-line n/no-unsupported-features/node-builtins
   return globalThis.crypto
 }
 
@@ -26,13 +28,11 @@ async function shasum(data: Uint8Array) {
   return hex(new Uint8Array(digest))
 }
 function hex(data: Uint8Array) {
-  return Array.from(data)
-    .map((i) => i.toString(16).padStart(2, '0'))
-    .join('')
+  return [...data].map((i) => i.toString(16).padStart(2, '0')).join('')
 }
 
 // Sample file to verify checksum against
-const file = `7eeec7b86ddfefd7d7b66e137b2b9220a527528f-185x278.jpg`
+const file = '7eeec7b86ddfefd7d7b66e137b2b9220a527528f-185x278.jpg'
 
 test('untar movies dataset export', async () => {
   const fileStream = readFileAsWebStream(`${__dirname}/fixtures/movies.tar`)

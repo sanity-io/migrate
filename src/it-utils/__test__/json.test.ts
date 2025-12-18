@@ -2,32 +2,27 @@ import {expect, test} from 'vitest'
 
 import {parseJSON} from '../json.js'
 
+async function* createTestJSONGenerator() {
+  yield '{"someString": "string"}'
+  yield '{"someNumber": 42}'
+}
+
 test('parse JSON', async () => {
-  const gen = async function* () {
-    yield '{"someString": "string"}'
-    yield '{"someNumber": 42}'
-  }
+  const it = parseJSON(createTestJSONGenerator())
 
-  const it = parseJSON(gen())
-
-  expect(await it.next()).toEqual({value: {someString: 'string'}, done: false})
-  expect(await it.next()).toEqual({value: {someNumber: 42}, done: false})
-  expect(await it.next()).toEqual({value: undefined, done: true})
+  expect(await it.next()).toEqual({done: false, value: {someString: 'string'}})
+  expect(await it.next()).toEqual({done: false, value: {someNumber: 42}})
+  expect(await it.next()).toEqual({done: true, value: undefined})
 })
 
 test('parse JSON with a custom parser', async () => {
-  const gen = async function* () {
-    yield '{"someString": "string"}'
-    yield '{"someNumber": 42}'
-  }
-
-  const it = parseJSON(gen(), {
+  const it = parseJSON(createTestJSONGenerator(), {
     parse: (line) => ({
       parsed: JSON.parse(line),
     }),
   })
 
-  expect(await it.next()).toEqual({value: {parsed: {someString: 'string'}}, done: false})
-  expect(await it.next()).toEqual({value: {parsed: {someNumber: 42}}, done: false})
-  expect(await it.next()).toEqual({value: undefined, done: true})
+  expect(await it.next()).toEqual({done: false, value: {parsed: {someString: 'string'}}})
+  expect(await it.next()).toEqual({done: false, value: {parsed: {someNumber: 42}}})
+  expect(await it.next()).toEqual({done: true, value: undefined})
 })

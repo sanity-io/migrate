@@ -23,7 +23,7 @@ const CHUNK_SIZE = 1024
 export function bufferThroughFile(
   source: ReadableStream<Uint8Array>,
   filename: string,
-  options?: {signal: AbortSignal; keepFile?: boolean},
+  options?: {keepFile?: boolean; signal: AbortSignal},
 ) {
   const signal = options?.signal
 
@@ -68,7 +68,7 @@ export function bufferThroughFile(
     let totalBytesRead = 0
 
     return async function tryReadFromBuffer(handle: FileHandle) {
-      const {bytesRead, buffer} = await handle.read(
+      const {buffer, bytesRead} = await handle.read(
         new Uint8Array(CHUNK_SIZE),
         0,
         CHUNK_SIZE,
@@ -80,7 +80,7 @@ export function bufferThroughFile(
         return tryReadFromBuffer(handle)
       }
       totalBytesRead += bytesRead
-      return {bytesRead, buffer}
+      return {buffer, bytesRead}
     }
   }
 
@@ -141,20 +141,14 @@ export function bufferThroughFile(
       await onReaderEnd()
     }
     return new ReadableStream<Uint8Array>({
-      async start() {
-        if (signal?.aborted) {
-          throw new Error('Cannot create new buffered readers on aborted stream')
-        }
-        debug('Reader started reading from file handle')
-        onReaderStart()
-        await init()
-        await getReadHandle()
+      async cancel() {
+        await onEnd()
       },
       async pull(controller) {
         if (!readHandle) {
           throw new Error('Cannot read from closed handle')
         }
-        const {bytesRead, buffer} = await readChunk(await readHandle)
+        const {buffer, bytesRead} = await readChunk(await readHandle)
         if (bytesRead === 0 && bufferDone) {
           debug('Reader done reading from file handle')
           await onEnd()
@@ -163,8 +157,14 @@ export function bufferThroughFile(
           controller.enqueue(buffer.subarray(0, bytesRead))
         }
       },
-      async cancel() {
-        await onEnd()
+      async start() {
+        if (signal?.aborted) {
+          throw new Error('Cannot create new buffered readers on aborted stream')
+        }
+        debug('Reader started reading from file handle')
+        onReaderStart()
+        await init()
+        await getReadHandle()
       },
     })
   }

@@ -10,5 +10,5 @@ export async function createBufferFile() {
   )
 
   await mkdir(bufferDir, {recursive: true})
-  return path.join(bufferDir, `snapshot.ndjson`)
+  return path.join(bufferDir, 'snapshot.ndjson')
 }

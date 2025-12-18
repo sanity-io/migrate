@@ -1,27 +1,13 @@
 type SupportedMethod = 'GET' | 'POST'
 export type Endpoint = {
   global: boolean
+  method: SupportedMethod
   path: `/${string}`
   searchParams: [param: string, value: string][]
-  method: SupportedMethod
 }
 
 export const endpoints = {
-  users: {
-    me: (): Endpoint => ({
-      global: true,
-      path: `/users/me`,
-      method: 'GET',
-      searchParams: [],
-    }),
-  },
   data: {
-    query: (dataset: string): Endpoint => ({
-      global: false,
-      method: 'GET',
-      path: `/query/${dataset}`,
-      searchParams: [['perspective', 'raw']],
-    }),
     export: (dataset: string, documentTypes?: string[]): Endpoint => ({
       global: false,
       method: 'GET',
@@ -32,12 +18,12 @@ export const endpoints = {
     mutate: (
       dataset: string,
       options?: {
-        returnIds?: boolean
-        returnDocuments?: boolean
         autoGenerateArrayKeys?: boolean
-        visibility?: 'async' | 'sync' | 'deferred'
         dryRun?: boolean
+        returnDocuments?: boolean
+        returnIds?: boolean
         tag?: string
+        visibility?: 'async' | 'deferred' | 'sync'
       },
     ): Endpoint => {
       const params = [
@@ -56,5 +42,19 @@ export const endpoints = {
         searchParams: params,
       }
     },
+    query: (dataset: string): Endpoint => ({
+      global: false,
+      method: 'GET',
+      path: `/query/${dataset}`,
+      searchParams: [['perspective', 'raw']],
+    }),
+  },
+  users: {
+    me: (): Endpoint => ({
+      global: true,
+      method: 'GET',
+      path: '/users/me',
+      searchParams: [],
+    }),
   },
 }

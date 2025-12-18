@@ -18,7 +18,7 @@ function parseGroq(query: string) {
 export async function groqQuery<T>(
   it: AsyncIterableIterator<SanityDocument>,
   query: string,
-  params?: Record<string, any>,
+  params?: Record<string, unknown>,
 ): Promise<T> {
   const parsedFilter = parseGroq(query)
   const all = await toArray(it)

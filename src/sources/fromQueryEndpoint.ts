@@ -6,11 +6,11 @@ import {type APIConfig} from '../types.js'
 export function fromQueryEndpoint(options: APIConfig) {
   return fetchAsyncIterator(
     toFetchOptions({
-      projectId: options.projectId,
-      apiVersion: options.apiVersion,
-      token: options.token,
       apiHost: options.apiHost ?? 'api.sanity.io',
+      apiVersion: options.apiVersion,
       endpoint: endpoints.data.query(options.dataset),
+      projectId: options.projectId,
+      token: options.token,
     }),
   )
 }

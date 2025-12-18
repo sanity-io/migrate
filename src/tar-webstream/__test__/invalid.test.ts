@@ -26,7 +26,7 @@ test('untar an empty tar file', async () => {
       }
     }
   }).rejects.toThrowErrorMatchingInlineSnapshot(
-    `[Error: Unexpected end of tar file. Expected 512 bytes of headers.]`,
+    '[Error: Unexpected end of tar file. Expected 512 bytes of headers.]',
   )
 })
 
@@ -38,7 +38,7 @@ test('untar an invalid tar file of > 512b', async () => {
       }
     }
   }).rejects.toThrowErrorMatchingInlineSnapshot(
-    `[Error: Invalid tar header. Maybe the tar is corrupted or it needs to be gunzipped?]`,
+    '[Error: Invalid tar header. Maybe the tar is corrupted or it needs to be gunzipped?]',
   )
 })
 
@@ -50,6 +50,6 @@ test('untar a corrupted tar file', async () => {
       }
     }
   }).rejects.toThrowErrorMatchingInlineSnapshot(
-    `[Error: Invalid tar header. Maybe the tar is corrupted or it needs to be gunzipped?]`,
+    '[Error: Invalid tar header. Maybe the tar is corrupted or it needs to be gunzipped?]',
   )
 })

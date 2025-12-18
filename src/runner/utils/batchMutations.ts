@@ -6,8 +6,13 @@ import {type TransactionPayload} from './toSanityMutations.js'
 // We're working on "raw" mutations, e.g what will be put into the mutations array in the request body
 const PADDING_SIZE = '{"mutations":[]}'.length
 
-function isTransactionPayload(payload: any): payload is TransactionPayload {
-  return payload && payload.mutations && Array.isArray(payload.mutations)
+function isTransactionPayload(payload: unknown): payload is TransactionPayload {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    'mutations' in payload &&
+    Array.isArray((payload as TransactionPayload).mutations)
+  )
 }
 
 /**
@@ -18,7 +23,7 @@ function isTransactionPayload(payload: any): payload is TransactionPayload {
  *
  */
 export async function* batchMutations(
-  mutations: AsyncIterableIterator<TransactionPayload | SanityMutation | SanityMutation[]>,
+  mutations: AsyncIterableIterator<SanityMutation | SanityMutation[] | TransactionPayload>,
   maxBatchSize: number,
 ): AsyncIterableIterator<TransactionPayload> {
   let currentBatch: SanityMutation[] = []
@@ -38,7 +43,7 @@ export async function* batchMutations(
 
     if (mutationSize >= maxBatchSize + PADDING_SIZE) {
       // the mutation size itself is bigger than max batch size, yield it as a single batch and hope for the best (the server has a bigger limit)
-      if (currentBatch.length) {
+      if (currentBatch.length > 0) {
         yield {mutations: currentBatch}
       }
       yield {mutations: [...arrify(mutation)]}

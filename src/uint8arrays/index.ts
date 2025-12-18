@@ -1,7 +1,7 @@
 /**
  * Copied over from uint8array-extras to sort out ESM build issues. Should be replaced with imports from that module eventually
  */
-// eslint-disable-next-line @typescript-eslint/unbound-method
+
 const objectToString = Object.prototype.toString
 const uint8ArrayStringified = '[object Uint8Array]'
 
@@ -54,8 +54,8 @@ export function areUint8ArraysEqual(a: Uint8Array, b: Uint8Array) {
     return false
   }
 
-  for (let index = 0; index < a.length; index++) {
-    if (a[index] !== b[index]) {
+  for (const [index, element] of a.entries()) {
+    if (element !== b[index]) {
       return false
     }
   }

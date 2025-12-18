@@ -37,7 +37,7 @@ function mapObject<T>(reducerFn: MapFn<T>, object: JsonObject, path: Path): T[] 
     ...Object.keys(object).flatMap((key) => {
       const value = object[key]
       if (value === undefined) return []
-      return flatMapAny(reducerFn, value, path.concat(getPathWithKey(value, key, object)))
+      return flatMapAny(reducerFn, value, [...path, getPathWithKey(value, key, object)])
     }),
   ]
 }
@@ -47,7 +47,7 @@ function mapArray<T>(mapFn: MapFn<T>, array: JsonArray, path: Path): T[] {
   return [
     ...callMap(mapFn, array, path),
     ...array.flatMap((item: JsonValue, index) =>
-      flatMapAny(mapFn, item, path.concat(getPathWithKey(item, index, array))),
+      flatMapAny(mapFn, item, [...path, getPathWithKey(item, index, array)]),
     ),
   ]
 }

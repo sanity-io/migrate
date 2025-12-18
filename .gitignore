@@ -10,10 +10,13 @@
 
 # Compiled code
 /lib
+/dist
 
 # Dev-fixtures
 moviedb.ndjson
-dist
 
 # cjs entry point
 mutations.js
+
+.vscode
+.claude

@@ -8,6 +8,7 @@ function wrapDocumentsIteratorProducer(factory: () => AsyncIterableIterator<Sani
     return factory()
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Need to dynamically add Symbol property to function
   ;(documents as any)[Symbol.asyncIterator] = () => {
     throw new Error(
       `The migration is attempting to iterate over the "documents" function, please call the function instead:

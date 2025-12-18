@@ -9,7 +9,7 @@ import {type AnyArray} from '../typeUtils.js'
  */
 type IndexedSegment = number
 
-export type {IndexedSegment, KeyedSegment}
+export type {IndexedSegment}
 
 /**
  * @public
@@ -46,8 +46,8 @@ export type SetIfMissingOp<T> = {
  * Represents an increment-operation that can be applied to a number
  */
 export type IncOp<Amount extends number> = {
-  type: 'inc'
   amount: Amount
+  type: 'inc'
 }
 
 /**
@@ -56,8 +56,8 @@ export type IncOp<Amount extends number> = {
  * Represents a decrement-operation that can be applied to a number
  */
 export type DecOp<Amount extends number> = {
-  type: 'dec'
   amount: Amount
+  type: 'dec'
 }
 
 /**
@@ -65,7 +65,7 @@ export type DecOp<Amount extends number> = {
  *
  * Represents a relative position in a document.
  */
-export type RelativePosition = 'before' | 'after'
+export type RelativePosition = 'after' | 'before'
 
 /**
  * @public
@@ -77,10 +77,10 @@ export type InsertOp<
   Pos extends RelativePosition,
   ReferenceItem extends IndexedSegment | KeyedSegment,
 > = {
-  type: 'insert'
-  referenceItem: ReferenceItem
-  position: Pos
   items: Items
+  position: Pos
+  referenceItem: ReferenceItem
+  type: 'insert'
 }
 
 /**
@@ -89,9 +89,9 @@ export type InsertOp<
  * Represents a truncate-operation that can be applied to an array
  */
 export type TruncateOp = {
-  type: 'truncate'
-  startIndex: number
   endIndex?: number
+  startIndex: number
+  type: 'truncate'
 }
 
 /**
@@ -103,9 +103,9 @@ export type ReplaceOp<
   Items extends AnyArray,
   ReferenceItem extends IndexedSegment | KeyedSegment,
 > = {
-  type: 'replace'
-  referenceItem: ReferenceItem
   items: Items
+  referenceItem: ReferenceItem
+  type: 'replace'
 }
 
 /**
@@ -124,21 +124,21 @@ export type DiffMatchPatchOp = {
  *
  * Represents an operation that can be applied to values of all types
  */
-export type Operation = PrimitiveOp | ArrayOp
+export type Operation = ArrayOp | PrimitiveOp
 
 /**
  * @public
  *
  * Represents an operation that can be applied to values of all types
  */
-export type AnyOp = SetOp<unknown> | SetIfMissingOp<unknown> | UnsetOp
+export type AnyOp = SetIfMissingOp<unknown> | SetOp<unknown> | UnsetOp
 
 /**
  * @public
  *
  * Represents an operation that can be applied to a number
  */
-export type NumberOp = IncOp<number> | DecOp<number>
+export type NumberOp = DecOp<number> | IncOp<number>
 
 /**
  * @public
@@ -162,4 +162,6 @@ export type ArrayOp =
  *
  * Represents an operation that can be applied to any primitive value
  */
-export type PrimitiveOp = AnyOp | StringOp | NumberOp
+export type PrimitiveOp = AnyOp | NumberOp | StringOp
+
+export {type KeyedSegment} from '@sanity/types'
