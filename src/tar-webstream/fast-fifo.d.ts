@@ -1,5 +1,5 @@
 declare module 'fast-fifo' {
-  declare class FixedFIFO<T> {
+  class FixedFIFO<T> {
     constructor(hwm: number)
     buffer: T[]
     mask: number
@@ -11,7 +11,7 @@ declare module 'fast-fifo' {
     shift(): T | undefined
     isEmpty(): boolean
   }
-  declare class FastFIFO<T> {
+  class FastFIFO<T> {
     constructor(hwm?: number)
     hwm: number
     head: FixedFIFO<T>

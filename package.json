@@ -34,22 +34,39 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
-    "lib"
+    "bin",
+    "dist",
+    "oclif.manifest.json",
+    "src"
   ],
   "scripts": {
-    "build": "pkg-utils build --strict --check --clean",
-    "check:types": "(cd ../../.. && tsgo --project packages/@sanity/migrate/tsconfig.lib.json --erasableSyntaxOnly)",
-    "clean": "rimraf lib coverage",
+    "build": "swc src -d dist --strip-leading-paths && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "postbuild": "oclif manifest",
+    "coverage": "vitest run --coverage",
+    "dev": "tsc --watch",
     "lint": "eslint .",
-    "prepublishOnly": "turbo run build",
-    "test": "vitest",
-    "watch": "pkg-utils watch"
+    "lint:fix": "eslint . --fix",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "watch": "swc src -d dist --strip-leading-paths --watch"
+  },
+  "oclif": {
+    "bin": "sanity-migrate",
+    "commands": {
+      "strategy": "single",
+      "target": "./dist/commands/dataset/migrate.js"
+    },
+    "dirname": "sanity-migrate",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
   },
   "dependencies": {
-    "@sanity/client": "catalog:",
+    "@sanity/client": "^7.13.2",
     "@sanity/mutate": "^0.15.0",
-    "@sanity/types": "workspace:*",
-    "@sanity/util": "workspace:*",
+    "@sanity/types": "^5.0.1",
+    "@sanity/util": "^5.0.1",
     "arrify": "^2.0.1",
     "debug": "^4.4.3",
     "fast-fifo": "^1.3.2",
@@ -57,16 +74,22 @@
     "p-map": "^7.0.1"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/package.config": "workspace:*",
-    "@repo/test-config": "workspace:*",
-    "@repo/tsconfig": "workspace:*",
-    "@sanity/pkg-utils": "catalog:",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.36.0",
+    "@swc/cli": "^0.7.9",
+    "@swc/core": "^1.15.5",
     "@types/debug": "^4.1.12",
-    "@typescript/native-preview": "catalog:",
-    "eslint": "catalog:",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-sanity": "^7.1.4",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.2",
+    "prettier-plugin-packagejson": "^2.5.19",
     "rimraf": "^5.0.10",
-    "vitest": "catalog:"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0",
+    "vitest": "^4.0.16"
   },
   "engines": {
     "node": ">=20.19 <22 || >=22.12"
