@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+import {webcrypto} from 'node:crypto'
 import path from 'node:path'
 import {fileURLToPath} from 'node:url'
 
@@ -14,7 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function getCrypto() {
   if (typeof globalThis.crypto === 'undefined') {
-    return require('node:crypto').webcrypto
+    return webcrypto
   }
   return globalThis.crypto
 }
@@ -24,7 +26,7 @@ async function shasum(data: Uint8Array) {
   const digest = await subtle.digest('SHA-256', data)
   return hex(new Uint8Array(digest))
 }
-async function hex(data: Uint8Array) {
+function hex(data: Uint8Array) {
   return Array.from(data)
     .map((i) => i.toString(16).padStart(2, '0'))
     .join('')

@@ -105,7 +105,10 @@ async function collectDocumentMutations(
     )
   })
 
-  return (await Promise.all([...arrify(await documentMutations), ...nodeMigrations]))
+  const resolvedDocumentMutations = arrify(await documentMutations)
+  const resolvedNodeMigrations = await Promise.all(nodeMigrations)
+
+  return [...resolvedDocumentMutations, ...resolvedNodeMigrations]
     .flat()
     .flatMap((change) => (change ? normalizeDocumentMutation(doc._id, change) : []))
 }

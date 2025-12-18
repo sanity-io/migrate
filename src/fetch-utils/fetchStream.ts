@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
 export interface FetchOptions {
@@ -30,8 +31,12 @@ export async function assert2xx(res: Response): Promise<void> {
     let message: string
 
     if (jsonResponse?.error) {
-      if (typeof jsonResponse.error === 'object' && jsonResponse.error.description) {
-        message = `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
+      if (typeof jsonResponse.error === 'object') {
+        if (jsonResponse.error.description) {
+          message = `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
+        } else {
+          message = `${jsonResponse.error.type || res.status}: ${jsonResponse.message || 'Unknown error'}`
+        }
       } else {
         message = `${jsonResponse.error}: ${jsonResponse.message || ''}`
       }

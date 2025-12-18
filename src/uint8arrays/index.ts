@@ -1,6 +1,7 @@
 /**
  * Copied over from uint8array-extras to sort out ESM build issues. Should be replaced with imports from that module eventually
  */
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const objectToString = Object.prototype.toString
 const uint8ArrayStringified = '[object Uint8Array]'
 

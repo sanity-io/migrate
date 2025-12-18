@@ -33,12 +33,14 @@ export function bufferThroughFile(
   // Whether the all data has been written to the buffer file.
   let bufferDone = false
 
-  signal?.addEventListener('abort', async () => {
+  signal?.addEventListener('abort', () => {
     debug('Aborting bufferThroughFile')
-    await Promise.all([
+    Promise.all([
       writeHandle && writeHandle.close(),
-      readHandle && (await readHandle).close(),
-    ])
+      readHandle && readHandle.then((handle) => handle.close()),
+    ]).catch((error) => {
+      debug('Error closing handles on abort', error)
+    })
   })
 
   // Number of active readers. When this reaches 0, the read handle will be closed.
@@ -83,16 +85,20 @@ export function bufferThroughFile(
   }
 
   function init(): Promise<void> {
-    if (!ready) {
+    if (ready === undefined) {
       ready = (async () => {
         debug('Initializing bufferThroughFile')
         writeHandle = await open(filename, 'w')
         // start pumping data from the source stream to the buffer file
         debug('Start buffering source stream to file')
         // note, don't await this, as it will block the ReadableStream.start() method
-        void pump(source.getReader()).then(() => {
-          debug('Buffering source stream to buffer file')
-        })
+        pump(source.getReader())
+          .then(() => {
+            debug('Buffering source stream to buffer file')
+          })
+          .catch((error) => {
+            debug('Error pumping source stream', error)
+          })
       })()
     }
     return ready
