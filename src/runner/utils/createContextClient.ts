@@ -1,11 +1,11 @@
 import {createClient, type SanityClient} from '@sanity/client'
 
-import {limitClientConcurrency} from './limitClientConcurrency'
+import {limitClientConcurrency} from './limitClientConcurrency.js'
 
 export function createContextClient(config: Parameters<typeof createClient>[0]): RestrictedClient {
   return restrictClient(
     limitClientConcurrency(
-      createClient({...config, useCdn: false, requestTagPrefix: 'sanity.migration'}),
+      createClient({...config, requestTagPrefix: 'sanity.migration', useCdn: false}),
     ),
   )
 }
@@ -49,7 +49,10 @@ function restrictClient(client: SanityClient): RestrictedClient {
           }
         }
         default: {
-          if (ALLOWED_PROPERTIES.includes(property as any)) {
+          if (
+            typeof property === 'string' &&
+            ALLOWED_PROPERTIES.includes(property as AllowedMethods)
+          ) {
             return target[property as keyof SanityClient]
           }
           throw new Error(

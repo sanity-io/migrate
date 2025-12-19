@@ -1,13 +1,16 @@
 import {evaluate, type ExprNode, parse} from 'groq-js'
 
-import {filter as filterIt} from './filter'
+import {filter as filterIt} from './filter.js'
 
 function parseGroqFilter(filter: string) {
   try {
     return parse(`*[${filter}]`)
   } catch (err) {
-    err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
-    throw err
+    if (err instanceof Error) {
+      err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
+      throw err
+    }
+    throw new Error(`Failed to parse GROQ filter "${filter}": ${String(err)}`)
   }
 }
 

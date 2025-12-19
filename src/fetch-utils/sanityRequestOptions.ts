@@ -1,12 +1,12 @@
 import {createRequire} from 'node:module'
 
-import {type Endpoint} from './endpoints'
-import {type FetchOptions} from './fetchStream'
+import {type Endpoint} from './endpoints.js'
+import {type FetchOptions} from './fetchStream.js'
 
 const require = createRequire(import.meta.url)
 
 function getUserAgent() {
-  if (typeof window === 'undefined') {
+  if ((globalThis as Record<string, unknown>).window === undefined) {
     // only set UA if we're in a non-browser environment
     try {
       const pkg = require('../../package.json')
@@ -18,13 +18,14 @@ function getUserAgent() {
 }
 
 interface SanityRequestOptions {
-  endpoint: Endpoint
-  apiVersion: `vX` | `v${number}-${number}-${number}`
   apiHost: string
+  apiVersion: 'vX' | `v${number}-${number}-${number}`
+  endpoint: Endpoint
   projectId: string
-  token?: string
+
   body?: string
   tag?: string
+  token?: string
 }
 
 function normalizeApiHost(apiHost: string) {
@@ -32,13 +33,13 @@ function normalizeApiHost(apiHost: string) {
 }
 
 export function toFetchOptions(req: SanityRequestOptions): FetchOptions {
-  const {endpoint, apiVersion, tag, projectId, apiHost, token, body} = req
+  const {apiHost, apiVersion, body, endpoint, projectId, tag, token} = req
   const requestInit: RequestInit = {
-    method: endpoint.method || 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    body,
+    method: endpoint.method || 'GET',
+    ...(body !== undefined && {body}),
   }
   const ua = getUserAgent()
   if (ua) {
@@ -62,7 +63,7 @@ export function toFetchOptions(req: SanityRequestOptions): FetchOptions {
   ]).toString()
 
   return {
-    url: `https://${host}/${path}${searchParams ? `?${searchParams}` : ''}`,
     init: requestInit,
+    url: `https://${host}/${path}${searchParams ? `?${searchParams}` : ''}`,
   }
 }

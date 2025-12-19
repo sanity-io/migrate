@@ -1,7 +1,7 @@
 import {describe, expect, test} from 'vitest'
 
-import {toArray} from '../../../it-utils'
-import {batchMutations} from '../batchMutations'
+import {toArray} from '../../../it-utils/index.js'
+import {batchMutations} from '../batchMutations.js'
 
 function byteLength(obj: unknown) {
   return JSON.stringify(obj).length
@@ -21,8 +21,8 @@ describe('mutation payload batching', () => {
 
     const it = batchMutations(gen(), firstSize + secondSize)
 
-    expect(await it.next()).toEqual({value: {mutations: [first, second]}, done: false})
-    expect(await it.next()).toEqual({value: undefined, done: true})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [first, second]}})
+    expect(await it.next()).toEqual({done: true, value: undefined})
   })
 
   test('when max batch is not big enough to fit all values', async () => {
@@ -37,9 +37,9 @@ describe('mutation payload batching', () => {
 
     const it = batchMutations(gen(), firstSize)
 
-    expect(await it.next()).toEqual({value: {mutations: [first]}, done: false})
-    expect(await it.next()).toEqual({value: {mutations: [second]}, done: false})
-    expect(await it.next()).toEqual({value: undefined, done: true})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [first]}})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [second]}})
+    expect(await it.next()).toEqual({done: true, value: undefined})
   })
 
   test('when each mutation is bigger than max batch size', async () => {
@@ -52,9 +52,9 @@ describe('mutation payload batching', () => {
 
     const it = batchMutations(gen(), 1)
 
-    expect(await it.next()).toEqual({value: {mutations: [first]}, done: false})
-    expect(await it.next()).toEqual({value: {mutations: [second]}, done: false})
-    expect(await it.next()).toEqual({value: undefined, done: true})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [first]}})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [second]}})
+    expect(await it.next()).toEqual({done: true, value: undefined})
   })
 
   test('when some mutations can be chunked, others not', async () => {
@@ -82,8 +82,8 @@ describe('mutation payload batching', () => {
     }
     const it = batchMutations(gen(), byteLength(first) + byteLength(second))
 
-    expect(await it.next()).toEqual({value: {mutations: [first, second]}, done: false})
-    expect(await it.next()).toEqual({value: {mutations: third}, done: false})
+    expect(await it.next()).toEqual({done: false, value: {mutations: [first, second]}})
+    expect(await it.next()).toEqual({done: false, value: {mutations: third}})
   })
 })
 
@@ -125,7 +125,7 @@ test('transactions are always in the same batch, but might include other mutatio
     transaction,
     {mutations: [fourth]},
   ])
-  expect(await it.next()).toEqual({value: undefined, done: true})
+  expect(await it.next()).toEqual({done: true, value: undefined})
 })
 
 test('transactions are always batched as-is if preserveTransactions: true', async () => {
@@ -160,8 +160,8 @@ test('transactions are always batched as-is if preserveTransactions: true', asyn
     [first, second, transaction, fourth].reduce((l, m) => l + byteLength(m), 0),
   )
 
-  expect(await it.next()).toEqual({value: {mutations: [first, second]}, done: false})
-  expect(await it.next()).toEqual({value: transaction, done: false})
-  expect(await it.next()).toEqual({value: {mutations: [fourth]}, done: false})
-  expect(await it.next()).toEqual({value: undefined, done: true})
+  expect(await it.next()).toEqual({done: false, value: {mutations: [first, second]}})
+  expect(await it.next()).toEqual({done: false, value: transaction})
+  expect(await it.next()).toEqual({done: false, value: {mutations: [fourth]}})
+  expect(await it.next()).toEqual({done: true, value: undefined})
 })

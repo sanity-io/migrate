@@ -3,8 +3,8 @@ import {fileURLToPath} from 'node:url'
 
 import {expect, test} from 'vitest'
 
-import {decodeText, parse, toArray} from '../../it-utils'
-import {fromExportArchive} from '../fromExportArchive'
+import {decodeText, parse, toArray} from '../../it-utils/index.js'
+import {fromExportArchive} from '../fromExportArchive.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

@@ -3,7 +3,8 @@ import {SanityEncoder} from '@sanity/mutate'
 import {type Path, type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
 
-import {type JsonArray, type JsonObject, type JsonValue} from '../json'
+import {type JsonArray, type JsonObject, type JsonValue} from '../json.js'
+import {isMutation, isNodePatch, isOperation, isTransaction} from '../mutations/asserters.js'
 import {
   at,
   type Mutation,
@@ -11,17 +12,16 @@ import {
   type Operation,
   patch,
   type Transaction,
-} from '../mutations'
-import {isMutation, isNodePatch, isOperation, isTransaction} from '../mutations/asserters'
+} from '../mutations/index.js'
 import {
   type AsyncIterableMigration,
   type Migration,
   type MigrationContext,
   type NodeMigration,
   type NodeMigrationReturnValue,
-} from '../types'
-import {flatMapDeep} from './utils/flatMapDeep'
-import {getValueType} from './utils/getValueType'
+} from '../types.js'
+import {flatMapDeep} from './utils/flatMapDeep.js'
+import {getValueType} from './utils/getValueType.js'
 
 export function normalizeMigrateDefinition(migration: Migration): AsyncIterableMigration {
   if (typeof migration.migrate == 'function') {
@@ -29,8 +29,8 @@ export function normalizeMigrateDefinition(migration: Migration): AsyncIterableM
     return normalizeIteratorValues(migration.migrate)
   }
   return createAsyncIterableMutation(migration.migrate, {
-    filter: migration.filter,
-    documentTypes: migration.documentTypes,
+    ...(migration.filter !== undefined && {filter: migration.filter}),
+    ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
   })
 }
 
@@ -48,19 +48,20 @@ function normalizeIteratorValues(asyncIterable: AsyncIterableMigration): AsyncIt
  * @param change - The Mutation or NodePatch
  */
 function normalizeMutation(
-  change: Transaction | Mutation | RawMutation | (Mutation | Transaction | RawMutation)[],
+  change: (Mutation | RawMutation | Transaction)[] | Mutation | RawMutation | Transaction,
 ): (Mutation | Transaction)[] {
   if (Array.isArray(change)) {
     return change.flatMap((ch) => normalizeMutation(ch))
   }
   if (isRawMutation(change)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- SanityEncoder.decodeAll requires specific mutation format
     return SanityEncoder.decodeAll([change] as any) as Mutation[]
   }
   return [change]
 }
 
 function isRawMutation(
-  mutation: Transaction | Mutation | NodePatch | Operation | RawMutation,
+  mutation: Mutation | NodePatch | Operation | RawMutation | Transaction,
 ): mutation is RawMutation {
   return (
     'createIfNotExists' in mutation ||
@@ -72,7 +73,7 @@ function isRawMutation(
 }
 export function createAsyncIterableMutation(
   migration: NodeMigration,
-  opts: {filter?: string; documentTypes?: string[]},
+  opts: {documentTypes?: string[]; filter?: string},
 ): AsyncIterableMigration {
   const documentTypesSet = new Set(opts.documentTypes)
 
@@ -105,7 +106,10 @@ async function collectDocumentMutations(
     )
   })
 
-  return (await Promise.all([...arrify(await documentMutations), ...nodeMigrations]))
+  const resolvedDocumentMutations = arrify(await documentMutations)
+  const resolvedNodeMigrations = await Promise.all(nodeMigrations)
+
+  return [...resolvedDocumentMutations, ...resolvedNodeMigrations]
     .flat()
     .flatMap((change) => (change ? normalizeDocumentMutation(doc._id, change) : []))
 }
@@ -118,16 +122,17 @@ async function collectDocumentMutations(
 function normalizeDocumentMutation(
   documentId: string,
   change:
-    | Transaction
+    | (Mutation | NodePatch | RawMutation | Transaction)[]
     | Mutation
     | NodePatch
     | RawMutation
-    | (Mutation | NodePatch | Transaction | RawMutation)[],
-): Mutation | Transaction | (Mutation | Transaction)[] {
+    | Transaction,
+): (Mutation | Transaction)[] | Mutation | Transaction {
   if (Array.isArray(change)) {
     return change.flatMap((ch) => normalizeDocumentMutation(documentId, ch))
   }
   if (isRawMutation(change)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- SanityEncoder.decodeAll requires specific mutation format
     return SanityEncoder.decodeAll([change] as any)[0] as Mutation
   }
   if (isTransaction(change)) {
@@ -144,16 +149,17 @@ function normalizeDocumentMutation(
 function normalizeNodeMutation(
   path: Path,
   change: Mutation | NodePatch | Operation | RawMutation | RawMutation[],
-): Mutation | NodePatch | (Mutation | NodePatch)[] {
+): (Mutation | NodePatch)[] | Mutation | NodePatch {
   if (Array.isArray(change)) {
     return change.flatMap((ch) => normalizeNodeMutation(path, ch))
   }
   if (isRawMutation(change)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- SanityEncoder.decodeAll requires specific mutation format
     return SanityEncoder.decodeAll([change] as any)[0] as Mutation
   }
 
   if (isNodePatch(change)) {
-    return at(path.concat(change.path), change.op)
+    return at([...path, ...change.path], change.op)
   }
   return isOperation(change) ? at(path, change) : change
 }
@@ -163,21 +169,28 @@ function migrateNodeType(
   value: JsonValue,
   path: Path,
   context: MigrationContext,
-): void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue> {
+): NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void {
   switch (getValueType(value)) {
-    case 'string':
-      return migration.string?.(value as string, path, context)
-    case 'number':
-      return migration.number?.(value as number, path, context)
-    case 'boolean':
-      return migration.boolean?.(value as boolean, path, context)
-    case 'object':
-      return migration.object?.(value as JsonObject, path, context)
-    case 'array':
+    case 'array': {
       return migration.array?.(value as JsonArray, path, context)
-    case 'null':
+    }
+    case 'boolean': {
+      return migration.boolean?.(value as boolean, path, context)
+    }
+    case 'null': {
       return migration.null?.(value as null, path, context)
-    default:
+    }
+    case 'number': {
+      return migration.number?.(value as number, path, context)
+    }
+    case 'object': {
+      return migration.object?.(value as JsonObject, path, context)
+    }
+    case 'string': {
+      return migration.string?.(value as string, path, context)
+    }
+    default: {
       throw new Error('Unknown value type')
+    }
   }
 }

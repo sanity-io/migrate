@@ -1,21 +1,22 @@
 import {type SanityDocument} from '@sanity/types'
 
-import {bufferThroughFile} from '../fs-webstream/bufferThroughFile'
-import {decodeText} from '../it-utils'
-import {parse, stringify} from '../it-utils/ndjson'
-import {fromExportArchive} from '../sources/fromExportArchive'
-import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint'
-import {type APIConfig, type Migration, type MigrationContext} from '../types'
-import {asyncIterableToStream} from '../utils/asyncIterableToStream'
-import {streamToAsyncIterator} from '../utils/streamToAsyncIterator'
-import {collectMigrationMutations} from './collectMigrationMutations'
-import {applyFilters} from './utils/applyFilters'
-import {createContextClient} from './utils/createContextClient'
-import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient'
-import {createBufferFile} from './utils/getBufferFile'
+import {bufferThroughFile} from '../fs-webstream/bufferThroughFile.js'
+import {decodeText} from '../it-utils/index.js'
+import {parse, stringify} from '../it-utils/ndjson.js'
+import {fromExportArchive} from '../sources/fromExportArchive.js'
+import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint.js'
+import {type APIConfig, type Migration, type MigrationContext} from '../types.js'
+import {asyncIterableToStream} from '../utils/asyncIterableToStream.js'
+import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
+import {collectMigrationMutations} from './collectMigrationMutations.js'
+import {applyFilters} from './utils/applyFilters.js'
+import {createContextClient} from './utils/createContextClient.js'
+import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient.js'
+import {createBufferFile} from './utils/getBufferFile.js'
 
 interface MigrationRunnerOptions {
   api: APIConfig
+
   exportPath?: string
 }
 
@@ -23,7 +24,10 @@ export async function* dryRun(config: MigrationRunnerOptions, migration: Migrati
   const source = config.exportPath
     ? fromExportArchive(config.exportPath)
     : streamToAsyncIterator(
-        await fromExportEndpoint({...config.api, documentTypes: migration.documentTypes}),
+        await fromExportEndpoint({
+          ...config.api,
+          ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
+        }),
       )
 
   const filteredDocuments = applyFilters(
@@ -45,8 +49,8 @@ export async function* dryRun(config: MigrationRunnerOptions, migration: Migrati
   const filteredDocumentsClient = createFilteredDocumentsClient(createReader)
   const context: MigrationContext = {
     client,
-    filtered: filteredDocumentsClient,
     dryRun: true,
+    filtered: filteredDocumentsClient,
   }
 
   yield* collectMigrationMutations(

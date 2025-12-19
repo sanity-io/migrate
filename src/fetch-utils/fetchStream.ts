@@ -1,9 +1,20 @@
-import {streamToAsyncIterator} from '../utils/streamToAsyncIterator'
+import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
 export interface FetchOptions {
-  url: string | URL
   init: RequestInit
+  url: string | URL
 }
+
+interface ErrorResponse {
+  error?:
+    | string
+    | {
+        description?: string
+        type?: string
+      }
+  message?: string
+}
+
 export class HTTPError extends Error {
   statusCode: number
 
@@ -16,15 +27,17 @@ export class HTTPError extends Error {
 
 export async function assert2xx(res: Response): Promise<void> {
   if (res.status < 200 || res.status > 299) {
-    const jsonResponse = await res.json().catch(() => null)
+    const jsonResponse = (await res.json().catch(() => null)) as ErrorResponse | null
 
     let message: string
 
     if (jsonResponse?.error) {
-      if (jsonResponse?.error?.description) {
-        message = `${jsonResponse?.error?.type || res.status}: ${jsonResponse.error.description}`
+      if (typeof jsonResponse.error === 'object') {
+        message = jsonResponse.error.description
+          ? `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
+          : `${jsonResponse.error.type || res.status}: ${jsonResponse.message || 'Unknown error'}`
       } else {
-        message = `${jsonResponse.error}: ${jsonResponse.message}`
+        message = `${jsonResponse.error}: ${jsonResponse.message || ''}`
       }
     } else {
       message = `HTTP Error ${res.status}: ${res.statusText}`
@@ -34,7 +47,7 @@ export async function assert2xx(res: Response): Promise<void> {
   }
 }
 
-export async function fetchStream({url, init}: FetchOptions) {
+export async function fetchStream({init, url}: FetchOptions) {
   const response = await fetch(url, init)
   await assert2xx(response)
   if (response.body === null) throw new Error('No response received')

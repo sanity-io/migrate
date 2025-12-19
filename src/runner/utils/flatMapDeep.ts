@@ -1,7 +1,7 @@
 import {type Path, type PathSegment} from '@sanity/types'
 
-import {type JsonArray, type JsonObject, type JsonValue} from '../../json'
-import {getValueType} from './getValueType'
+import {type JsonArray, type JsonObject, type JsonValue} from '../../json.js'
+import {getValueType} from './getValueType.js'
 
 type SkipMarker = {_: 'SKIP_MARKER'}
 export const SKIP_MARKER: SkipMarker = {_: 'SKIP_MARKER'}
@@ -34,9 +34,11 @@ type MapFn<T> = (value: JsonValue, path: Path) => T | T[]
 function mapObject<T>(reducerFn: MapFn<T>, object: JsonObject, path: Path): T[] {
   return [
     ...callMap(reducerFn, object, path),
-    ...Object.keys(object).flatMap((key) =>
-      flatMapAny(reducerFn, object[key], path.concat(getPathWithKey(object[key], key, object))),
-    ),
+    ...Object.keys(object).flatMap((key) => {
+      const value = object[key]
+      if (value === undefined) return []
+      return flatMapAny(reducerFn, value, [...path, getPathWithKey(value, key, object)])
+    }),
   ]
 }
 
@@ -45,7 +47,7 @@ function mapArray<T>(mapFn: MapFn<T>, array: JsonArray, path: Path): T[] {
   return [
     ...callMap(mapFn, array, path),
     ...array.flatMap((item: JsonValue, index) =>
-      flatMapAny(mapFn, item, path.concat(getPathWithKey(item, index, array))),
+      flatMapAny(mapFn, item, [...path, getPathWithKey(item, index, array)]),
     ),
   ]
 }

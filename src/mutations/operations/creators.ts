@@ -1,6 +1,6 @@
 import arrify from 'arrify'
 
-import {type AnyArray, type ArrayElement, type NormalizeReadOnlyArray} from '../typeUtils'
+import {type AnyArray, type ArrayElement, type NormalizeReadOnlyArray} from '../typeUtils.js'
 import {
   type DecOp,
   type DiffMatchPatchOp,
@@ -14,7 +14,7 @@ import {
   type SetOp,
   type TruncateOp,
   type UnsetOp,
-} from './types'
+} from './types.js'
 
 /**
  * Creates a `set` operation with the provided value.
@@ -71,8 +71,8 @@ export const unset = (): UnsetOp => ({type: 'unset'})
  * ```
  */
 export const inc = <const N extends number = 1>(amount: N = 1 as N): IncOp<N> => ({
-  type: 'inc',
   amount,
+  type: 'inc',
 })
 
 /**
@@ -88,8 +88,8 @@ export const inc = <const N extends number = 1>(amount: N = 1 as N): IncOp<N> =>
  * ```
  */
 export const dec = <const N extends number = 1>(amount: N = 1 as N): DecOp<N> => ({
-  type: 'dec',
   amount,
+  type: 'dec',
 })
 
 /**
@@ -124,15 +124,16 @@ export function insert<
   const Pos extends RelativePosition,
   const ReferenceItem extends IndexedSegment | KeyedSegment,
 >(
-  items: Items | ArrayElement<Items>,
+  items: ArrayElement<Items> | Items,
   position: Pos,
   indexOrReferenceItem: ReferenceItem,
 ): InsertOp<NormalizeReadOnlyArray<Items>, Pos, ReferenceItem> {
   return {
-    type: 'insert',
-    referenceItem: indexOrReferenceItem,
-    position,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- arrify loses type information, cast needed for tuple type preservation
     items: arrify(items) as any,
+    position,
+    referenceItem: indexOrReferenceItem,
+    type: 'insert',
   }
 }
 
@@ -149,7 +150,7 @@ export function insert<
  * const appendObjects = append([{name: 'foo'}, [{name: 'bar'}]])
  * ```
  */
-export function append<const Items extends AnyArray<unknown>>(items: Items | ArrayElement<Items>) {
+export function append<const Items extends AnyArray<unknown>>(items: ArrayElement<Items> | Items) {
   return insert(items, 'after', -1)
 }
 
@@ -166,7 +167,7 @@ export function append<const Items extends AnyArray<unknown>>(items: Items | Arr
  * const prependObjects = prepend([{name: 'foo'}, [{name: 'bar'}]])
  * ```
  */
-export function prepend<const Items extends AnyArray<unknown>>(items: Items | ArrayElement<Items>) {
+export function prepend<const Items extends AnyArray<unknown>>(items: ArrayElement<Items> | Items) {
   return insert(items, 'before', 0)
 }
 
@@ -187,7 +188,7 @@ export function prepend<const Items extends AnyArray<unknown>>(items: Items | Ar
 export function insertBefore<
   const Items extends AnyArray<unknown>,
   const ReferenceItem extends IndexedSegment | KeyedSegment,
->(items: Items | ArrayElement<Items>, indexOrReferenceItem: ReferenceItem) {
+>(items: ArrayElement<Items> | Items, indexOrReferenceItem: ReferenceItem) {
   return insert(items, 'before', indexOrReferenceItem)
 }
 
@@ -208,7 +209,7 @@ export const insertAfter = <
   const Items extends AnyArray<unknown>,
   const ReferenceItem extends IndexedSegment | KeyedSegment,
 >(
-  items: Items | ArrayElement<Items>,
+  items: ArrayElement<Items> | Items,
   indexOrReferenceItem: ReferenceItem,
 ) => {
   return insert(items, 'after', indexOrReferenceItem)
@@ -231,9 +232,9 @@ export const insertAfter = <
  */
 export function truncate(startIndex: number, endIndex?: number): TruncateOp {
   return {
-    type: 'truncate',
     startIndex,
-    endIndex,
+    type: 'truncate',
+    ...(endIndex !== undefined && {endIndex}),
   }
 }
 
@@ -252,13 +253,16 @@ export function truncate(startIndex: number, endIndex?: number): TruncateOp {
  * const replaceObject = replace({name: 'bar'}, {_key: 'xyz'})
  * ```
  */
-export function replace<Items extends any[], ReferenceItem extends IndexedSegment | KeyedSegment>(
-  items: Items | ArrayElement<Items>,
+export function replace<
+  Items extends unknown[],
+  ReferenceItem extends IndexedSegment | KeyedSegment,
+>(
+  items: ArrayElement<Items> | Items,
   referenceItem: ReferenceItem,
 ): ReplaceOp<Items, ReferenceItem> {
   return {
-    type: 'replace',
-    referenceItem,
     items: arrify(items) as Items,
+    referenceItem,
+    type: 'replace',
   }
 }

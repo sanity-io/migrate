@@ -2,40 +2,41 @@ import {type MultipleMutationResult} from '@sanity/client'
 import {type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
 
-import {endpoints} from '../fetch-utils/endpoints'
-import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream'
-import {toFetchOptions} from '../fetch-utils/sanityRequestOptions'
-import {bufferThroughFile} from '../fs-webstream/bufferThroughFile'
-import {decodeText, parseJSON} from '../it-utils'
-import {concatStr} from '../it-utils/concatStr'
-import {lastValueFrom} from '../it-utils/lastValueFrom'
-import {mapAsync} from '../it-utils/mapAsync'
-import {parse, stringify} from '../it-utils/ndjson'
-import {tap} from '../it-utils/tap'
-import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint'
+import {endpoints} from '../fetch-utils/endpoints.js'
+import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
+import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
+import {bufferThroughFile} from '../fs-webstream/bufferThroughFile.js'
+import {concatStr} from '../it-utils/concatStr.js'
+import {decodeText, parseJSON} from '../it-utils/index.js'
+import {lastValueFrom} from '../it-utils/lastValueFrom.js'
+import {mapAsync} from '../it-utils/mapAsync.js'
+import {parse, stringify} from '../it-utils/ndjson.js'
+import {tap} from '../it-utils/tap.js'
+import {fromExportEndpoint, safeJsonParser} from '../sources/fromExportEndpoint.js'
 import {
   type APIConfig,
   type Migration,
   type MigrationContext,
   type MigrationProgress,
-} from '../types'
-import {asyncIterableToStream} from '../utils/asyncIterableToStream'
-import {streamToAsyncIterator} from '../utils/streamToAsyncIterator'
-import {collectMigrationMutations} from './collectMigrationMutations'
+} from '../types.js'
+import {asyncIterableToStream} from '../utils/asyncIterableToStream.js'
+import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
+import {collectMigrationMutations} from './collectMigrationMutations.js'
 import {
   DEFAULT_MUTATION_CONCURRENCY,
   MAX_MUTATION_CONCURRENCY,
   MUTATION_ENDPOINT_MAX_BODY_SIZE,
-} from './constants'
-import {applyFilters} from './utils/applyFilters'
-import {batchMutations} from './utils/batchMutations'
-import {createContextClient} from './utils/createContextClient'
-import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient'
-import {createBufferFile} from './utils/getBufferFile'
-import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations'
+} from './constants.js'
+import {applyFilters} from './utils/applyFilters.js'
+import {batchMutations} from './utils/batchMutations.js'
+import {createContextClient} from './utils/createContextClient.js'
+import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient.js'
+import {createBufferFile} from './utils/getBufferFile.js'
+import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations.js'
 
 export interface MigrationRunnerConfig {
   api: APIConfig
+
   concurrency?: number
   onProgress?: (event: MigrationProgress) => void
 }
@@ -46,29 +47,29 @@ export async function* toFetchOptionsIterable(
 ) {
   for await (const transaction of mutations) {
     yield toFetchOptions({
-      projectId: apiConfig.projectId,
-      apiVersion: apiConfig.apiVersion,
-      token: apiConfig.token,
-      tag: 'sanity.migration.mutate',
       apiHost: apiConfig.apiHost ?? 'api.sanity.io',
+      apiVersion: apiConfig.apiVersion,
+      body: JSON.stringify(transaction),
       endpoint: endpoints.data.mutate(apiConfig.dataset, {
+        autoGenerateArrayKeys: true,
         returnIds: true,
         visibility: 'async',
-        autoGenerateArrayKeys: true,
       }),
-      body: JSON.stringify(transaction),
+      projectId: apiConfig.projectId,
+      tag: 'sanity.migration.mutate',
+      token: apiConfig.token,
     })
   }
 }
 
 export async function run(config: MigrationRunnerConfig, migration: Migration) {
   const stats: MigrationProgress = {
+    completedTransactions: [],
+    currentTransactions: [],
     documents: 0,
     mutations: 0,
     pending: 0,
     queuedBatches: 0,
-    completedTransactions: [],
-    currentTransactions: [],
   }
 
   const filteredDocuments = applyFilters(
@@ -76,7 +77,10 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
     parse<SanityDocument>(
       decodeText(
         streamToAsyncIterator(
-          await fromExportEndpoint({...config.api, documentTypes: migration.documentTypes}),
+          await fromExportEndpoint({
+            ...config.api,
+            ...(migration.documentTypes !== undefined && {documentTypes: migration.documentTypes}),
+          }),
         ),
       ),
       {parse: safeJsonParser},
@@ -92,15 +96,15 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
 
   const client = createContextClient({
     ...config.api,
-    useCdn: false,
     requestTagPrefix: 'sanity.migration',
+    useCdn: false,
   })
 
   const filteredDocumentsClient = createFilteredDocumentsClient(createReader)
   const context: MigrationContext = {
     client,
-    filtered: filteredDocumentsClient,
     dryRun: false,
+    filtered: filteredDocumentsClient,
   }
 
   const documents = () =>

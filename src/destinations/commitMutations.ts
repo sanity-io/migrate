@@ -1,11 +1,11 @@
 import {type MultipleMutationResult} from '@sanity/client'
 
-import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream'
-import {concatStr} from '../it-utils/concatStr'
-import {decodeText} from '../it-utils/decodeText'
-import {parseJSON} from '../it-utils/json'
-import {lastValueFrom} from '../it-utils/lastValueFrom'
-import {mapAsync} from '../it-utils/mapAsync'
+import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
+import {concatStr} from '../it-utils/concatStr.js'
+import {decodeText} from '../it-utils/decodeText.js'
+import {parseJSON} from '../it-utils/json.js'
+import {lastValueFrom} from '../it-utils/lastValueFrom.js'
+import {mapAsync} from '../it-utils/mapAsync.js'
 
 export async function commitMutations(
   fetchOptions: AsyncIterableIterator<FetchOptions>,

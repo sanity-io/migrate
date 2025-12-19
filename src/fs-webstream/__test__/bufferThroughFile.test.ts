@@ -4,12 +4,12 @@ import {fileURLToPath} from 'node:url'
 
 import {describe, expect, test} from 'vitest'
 
-import {decodeText, parse} from '../../it-utils'
-import {firstValueFrom} from '../../it-utils/firstValueFrom'
-import {lastValueFrom} from '../../it-utils/lastValueFrom'
-import {asyncIterableToStream} from '../../utils/asyncIterableToStream'
-import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator'
-import {bufferThroughFile} from '../bufferThroughFile'
+import {firstValueFrom} from '../../it-utils/firstValueFrom.js'
+import {decodeText, parse} from '../../it-utils/index.js'
+import {lastValueFrom} from '../../it-utils/lastValueFrom.js'
+import {asyncIterableToStream} from '../../utils/asyncIterableToStream.js'
+import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
+import {bufferThroughFile} from '../bufferThroughFile.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -36,8 +36,8 @@ describe('using primary stream', () => {
     const bufferFile = getTestBufferFileName()
     const abortController = new AbortController()
     const createReader = bufferThroughFile(asyncIterableToStream(gen()), bufferFile, {
-      signal: abortController.signal,
       keepFile: true,
+      signal: abortController.signal,
     })
     const fileBufferStream = createReader()
     const lines = []
@@ -87,8 +87,8 @@ describe('using primary stream', () => {
     const bufferFile = getTestBufferFileName()
     const controller = new AbortController()
     const createReader = bufferThroughFile(asyncIterableToStream(gen()), bufferFile, {
-      signal: controller.signal,
       keepFile: true,
+      signal: controller.signal,
     })
     const fileBufferStream = createReader()
     const lines = []
@@ -126,15 +126,17 @@ describe('using secondary stream', () => {
     const bufferFile = getTestBufferFileName()
     const abortController = new AbortController()
     const createReader = bufferThroughFile(asyncIterableToStream(gen()), bufferFile, {
-      signal: abortController.signal,
       keepFile: true,
+      signal: abortController.signal,
     })
     const fileBufferStream = createReader()
 
     const lines = []
     for await (const chunk of parse(decodeText(streamToAsyncIterator(fileBufferStream)))) {
-      lines.push(chunk)
-      lines.push(await lastValueFrom(parse(decodeText(streamToAsyncIterator(createReader())))))
+      lines.push(
+        chunk,
+        await lastValueFrom(parse(decodeText(streamToAsyncIterator(createReader())))),
+      )
       if (lines.length === 6) {
         break
       }
@@ -188,8 +190,8 @@ describe('using secondary stream', () => {
     const bufferFile = getTestBufferFileName()
     const controller = new AbortController()
     const createReader = bufferThroughFile(asyncIterableToStream(gen()), bufferFile, {
-      signal: controller.signal,
       keepFile: true,
+      signal: controller.signal,
     })
     const primary = createReader()
     const first = await firstValueFrom(parse(decodeText(streamToAsyncIterator(primary))))
@@ -203,7 +205,7 @@ describe('using secondary stream', () => {
     await expect(() =>
       lastValueFrom(parse(decodeText(streamToAsyncIterator(createReader())))),
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `[Error: Cannot create new buffered readers on aborted stream]`,
+      '[Error: Cannot create new buffered readers on aborted stream]',
     )
   })
 })

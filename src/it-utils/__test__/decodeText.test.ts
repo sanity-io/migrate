@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest'
 
-import {decodeText} from '../decodeText'
-import {toArray} from '../toArray'
+import {decodeText} from '../decodeText.js'
+import {toArray} from '../toArray.js'
 
 const encoder = new TextEncoder()
 

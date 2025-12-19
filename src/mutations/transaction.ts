@@ -1,9 +1,10 @@
-import {type Mutation} from './types'
+import {type Mutation} from './types.js'
 
 export interface Transaction {
-  type: 'transaction'
-  id?: string
   mutations: Mutation[]
+  type: 'transaction'
+
+  id?: string
 }
 
 /**
@@ -20,12 +21,12 @@ export interface Transaction {
 export function transaction(transactionId: string, mutations: Mutation[]): Transaction
 export function transaction(mutations: Mutation[]): Transaction
 export function transaction(
-  idOrMutations: string | Mutation[],
+  idOrMutations: Mutation[] | string,
   _mutations?: Mutation[],
 ): Transaction {
   const [id, mutations] =
     typeof idOrMutations === 'string'
       ? [idOrMutations, _mutations as Mutation[]]
-      : [undefined, idOrMutations as Mutation[]]
-  return {type: 'transaction', id, mutations}
+      : [undefined, idOrMutations]
+  return {type: 'transaction', ...(id !== undefined && {id}), mutations}
 }

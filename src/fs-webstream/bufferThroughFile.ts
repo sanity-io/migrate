@@ -1,6 +1,6 @@
 import {type FileHandle, open, unlink} from 'node:fs/promises'
 
-import baseDebug from '../debug'
+import baseDebug from '../debug.js'
 
 const debug = baseDebug.extend('bufferThroughFile')
 
@@ -23,7 +23,7 @@ const CHUNK_SIZE = 1024
 export function bufferThroughFile(
   source: ReadableStream<Uint8Array>,
   filename: string,
-  options?: {signal: AbortSignal; keepFile?: boolean},
+  options?: {keepFile?: boolean; signal: AbortSignal},
 ) {
   const signal = options?.signal
 
@@ -33,12 +33,14 @@ export function bufferThroughFile(
   // Whether the all data has been written to the buffer file.
   let bufferDone = false
 
-  signal?.addEventListener('abort', async () => {
+  signal?.addEventListener('abort', () => {
     debug('Aborting bufferThroughFile')
-    await Promise.all([
+    Promise.all([
       writeHandle && writeHandle.close(),
-      readHandle && (await readHandle).close(),
-    ])
+      readHandle && readHandle.then((handle) => handle.close()),
+    ]).catch((error) => {
+      debug('Error closing handles on abort', error)
+    })
   })
 
   // Number of active readers. When this reaches 0, the read handle will be closed.
@@ -66,7 +68,7 @@ export function bufferThroughFile(
     let totalBytesRead = 0
 
     return async function tryReadFromBuffer(handle: FileHandle) {
-      const {bytesRead, buffer} = await handle.read(
+      const {buffer, bytesRead} = await handle.read(
         new Uint8Array(CHUNK_SIZE),
         0,
         CHUNK_SIZE,
@@ -78,21 +80,25 @@ export function bufferThroughFile(
         return tryReadFromBuffer(handle)
       }
       totalBytesRead += bytesRead
-      return {bytesRead, buffer}
+      return {buffer, bytesRead}
     }
   }
 
   function init(): Promise<void> {
-    if (!ready) {
+    if (ready === undefined) {
       ready = (async () => {
         debug('Initializing bufferThroughFile')
         writeHandle = await open(filename, 'w')
         // start pumping data from the source stream to the buffer file
         debug('Start buffering source stream to file')
         // note, don't await this, as it will block the ReadableStream.start() method
-        void pump(source.getReader()).then(() => {
-          debug('Buffering source stream to buffer file')
-        })
+        pump(source.getReader())
+          .then(() => {
+            debug('Buffering source stream to buffer file')
+          })
+          .catch((error) => {
+            debug('Error pumping source stream', error)
+          })
       })()
     }
     return ready
@@ -135,20 +141,14 @@ export function bufferThroughFile(
       await onReaderEnd()
     }
     return new ReadableStream<Uint8Array>({
-      async start() {
-        if (signal?.aborted) {
-          throw new Error('Cannot create new buffered readers on aborted stream')
-        }
-        debug('Reader started reading from file handle')
-        onReaderStart()
-        await init()
-        await getReadHandle()
+      async cancel() {
+        await onEnd()
       },
       async pull(controller) {
         if (!readHandle) {
           throw new Error('Cannot read from closed handle')
         }
-        const {bytesRead, buffer} = await readChunk(await readHandle)
+        const {buffer, bytesRead} = await readChunk(await readHandle)
         if (bytesRead === 0 && bufferDone) {
           debug('Reader done reading from file handle')
           await onEnd()
@@ -157,8 +157,14 @@ export function bufferThroughFile(
           controller.enqueue(buffer.subarray(0, bytesRead))
         }
       },
-      async cancel() {
-        await onEnd()
+      async start() {
+        if (signal?.aborted) {
+          throw new Error('Cannot create new buffered readers on aborted stream')
+        }
+        debug('Reader started reading from file handle')
+        onReaderStart()
+        await init()
+        await getReadHandle()
       },
     })
   }

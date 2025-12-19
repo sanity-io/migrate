@@ -1,4 +1,4 @@
-import {concatUint8Arrays} from '../uint8arrays'
+import {concatUint8Arrays} from '../uint8arrays/index.js'
 
 export function peekInto(readable: ReadableStream, options: {size: number}) {
   const {size} = options
@@ -13,18 +13,18 @@ export function peekInto(readable: ReadableStream, options: {size: number}) {
       resolve([
         head,
         new ReadableStream<Uint8Array>({
-          start(controller) {
-            controller.enqueue(head)
-            if (streamCompleted) {
-              controller.close()
-            }
-          },
           async pull(controller) {
             const {done, value} = await reader.read()
             if (done) {
               controller.close()
             } else {
               controller.enqueue(value)
+            }
+          },
+          start(controller) {
+            controller.enqueue(head)
+            if (streamCompleted) {
+              controller.close()
             }
           },
         }),

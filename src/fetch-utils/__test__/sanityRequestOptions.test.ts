@@ -1,15 +1,15 @@
 import {expect, test} from 'vitest'
 
-import {endpoints} from '../endpoints'
-import {toFetchOptions} from '../sanityRequestOptions'
+import {endpoints} from '../endpoints.js'
+import {toFetchOptions} from '../sanityRequestOptions.js'
 
 test('toFetchOptions', () => {
   expect(
     toFetchOptions({
-      projectId: 'xyz',
-      apiVersion: 'v2025-01-31',
       apiHost: 'api.sanity.io',
+      apiVersion: 'v2025-01-31',
       endpoint: endpoints.data.query('my-dataset'),
+      projectId: 'xyz',
     }),
   ).toEqual({
     init: {

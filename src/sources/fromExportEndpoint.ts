@@ -1,20 +1,20 @@
 import {type SanityDocument} from '@sanity/types'
 import {createSafeJsonParser} from '@sanity/util/createSafeJsonParser'
 
-import {endpoints} from '../fetch-utils/endpoints'
-import {fetchStream} from '../fetch-utils/fetchStream'
-import {toFetchOptions} from '../fetch-utils/sanityRequestOptions'
-import {type ExportAPIConfig} from '../types'
+import {endpoints} from '../fetch-utils/endpoints.js'
+import {fetchStream} from '../fetch-utils/fetchStream.js'
+import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
+import {type ExportAPIConfig} from '../types.js'
 
 export function fromExportEndpoint(options: ExportAPIConfig) {
   return fetchStream(
     toFetchOptions({
-      projectId: options.projectId,
-      apiVersion: options.apiVersion,
-      token: options.token,
       apiHost: options.apiHost ?? 'api.sanity.io',
-      tag: 'sanity.migration.export',
+      apiVersion: options.apiVersion,
       endpoint: endpoints.data.export(options.dataset, options.documentTypes),
+      projectId: options.projectId,
+      tag: 'sanity.migration.export',
+      token: options.token,
     }),
   )
 }

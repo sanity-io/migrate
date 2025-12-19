@@ -1,19 +1,17 @@
 import FIFO from 'fast-fifo'
 
-import {concatUint8Arrays} from '../uint8arrays'
+import {concatUint8Arrays} from '../uint8arrays/index.js'
 
 const EMPTY = new Uint8Array()
 
 // Extracted from https://github.com/mafintosh/tar-stream/blob/master/extract.js#L8 and converted to ts
 export class BufferList {
-  public buffered: number
-  public shifted: number
-  private queue: FIFO<Uint8Array>
+  public buffered: number = 0
+  public shifted: number = 0
   private _offset: number
+  private queue: FIFO<Uint8Array>
 
   constructor() {
-    this.buffered = 0
-    this.shifted = 0
     this.queue = new FIFO()
 
     this._offset = 0
@@ -22,10 +20,6 @@ export class BufferList {
   push(buffer: Uint8Array) {
     this.buffered += buffer.byteLength
     this.queue.push(buffer)
-  }
-
-  shiftFirst(size: number) {
-    return this.buffered === 0 ? null : this._next(size)
   }
 
   shift(size: number) {
@@ -44,6 +38,10 @@ export class BufferList {
     }
 
     return concatUint8Arrays(chunks)
+  }
+
+  shiftFirst(size: number) {
+    return this.buffered === 0 ? null : this._next(size)
   }
 
   private _next(size: number) {

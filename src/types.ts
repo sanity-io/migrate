@@ -1,17 +1,16 @@
 import {type MultipleMutationResult, type Mutation as RawMutation} from '@sanity/client'
 import {type Path, type SanityDocument} from '@sanity/types'
 
-import {type JsonArray, type JsonObject, type JsonValue} from './json'
-import {type Mutation, type NodePatch, type Operation, type Transaction} from './mutations'
-import {type RestrictedClient} from './runner/utils/createContextClient'
+import {type JsonArray, type JsonObject, type JsonValue} from './json.js'
+import {type Mutation, type NodePatch, type Operation, type Transaction} from './mutations/index.js'
+import {type RestrictedClient} from './runner/utils/createContextClient.js'
 
-export type {Path}
-export type * from './json'
+export type * from './json.js'
 
 export type AsyncIterableMigration = (
   documents: () => AsyncIterableIterator<SanityDocument>,
   context: MigrationContext,
-) => AsyncGenerator<Mutation | Transaction | (Mutation | Transaction)[]>
+) => AsyncGenerator<(Mutation | Transaction)[] | Mutation | Transaction>
 
 /**
  * @public
@@ -20,6 +19,15 @@ export type AsyncIterableMigration = (
  * {@link https://www.sanity.io/docs/schema-and-content-migrations#af2be129ccd6}
  */
 export interface Migration<Def extends MigrateDefinition = MigrateDefinition> {
+  /**
+   * An object of named helper functions corresponding to the primary schema type of the content you want to migrate.
+   * You can also run these functions as async and return the migration instructions as promises if you need to fetch data from elsewhere.
+   * If you want more control, `migrate` can also be an async iterable function that yields mutations or transactions.
+   * {@link NodeMigration}
+   * {@link AsyncIterableMigration}
+   *
+   */
+  migrate: Def
   /**
    * A reader-friendly description of what the content migration does
    */
@@ -30,7 +38,6 @@ export interface Migration<Def extends MigrateDefinition = MigrateDefinition> {
    * Note: This reflects the document types your migration will be based on, not necessarily the documents you will modify.
    */
   documentTypes?: string[]
-
   /**
    * A simple GROQ-filter (doesn’t support joins) for documents you want to run the content migration on.
    * Note: instead of adding `_type == 'yourType'` to the filter, it's better to add its `_type` to `documentTypes`.
@@ -38,16 +45,6 @@ export interface Migration<Def extends MigrateDefinition = MigrateDefinition> {
    * migration if its `_type` matches any of the provided `documentTypes` AND it also matches the `filter` (if provided).
    */
   filter?: string
-
-  /**
-   * An object of named helper functions corresponding to the primary schema type of the content you want to migrate.
-   * You can also run these functions as async and return the migration instructions as promises if you need to fetch data from elsewhere.
-   * If you want more control, `migrate` can also be an async iterable function that yields mutations or transactions.
-   * {@link NodeMigration}
-   * {@link AsyncIterableMigration}
-   *
-   */
-  migrate: Def
 }
 
 /**
@@ -57,11 +54,11 @@ export interface Migration<Def extends MigrateDefinition = MigrateDefinition> {
  */
 export interface MigrationContext {
   client: RestrictedClient
+  dryRun: boolean
   filtered: {
     getDocument<T extends SanityDocument>(id: string): Promise<T | undefined>
     getDocuments<T extends SanityDocument>(ids: string[]): Promise<T[]>
   }
-  dryRun: boolean
 }
 
 /**
@@ -71,7 +68,7 @@ export interface MigrationContext {
  * {@link NodeMigration}
  * {@link AsyncIterableMigration}
  */
-export type MigrateDefinition = NodeMigration | AsyncIterableMigration
+export type MigrateDefinition = AsyncIterableMigration | NodeMigration
 
 /**
  * Migration progress, only used internally (for now)
@@ -79,13 +76,13 @@ export type MigrateDefinition = NodeMigration | AsyncIterableMigration
  * @hidden
  */
 export type MigrationProgress = {
+  completedTransactions: MultipleMutationResult[]
+  currentTransactions: (Mutation | Transaction)[]
   documents: number
+  done?: boolean
   mutations: number
   pending: number
   queuedBatches: number
-  currentTransactions: (Transaction | Mutation)[]
-  completedTransactions: MultipleMutationResult[]
-  done?: boolean
 }
 
 /**
@@ -94,10 +91,11 @@ export type MigrationProgress = {
  * @hidden
  */
 export interface APIConfig {
-  projectId: string
-  apiVersion: `vX` | `v${number}-${number}-${number}`
-  token: string
+  apiVersion: 'vX' | `v${number}-${number}-${number}`
   dataset: string
+  projectId: string
+  token: string
+
   apiHost?: string
 }
 
@@ -138,44 +136,6 @@ export type NodeMigrationReturnValue = DocumentMigrationReturnValue | Operation 
  */
 export interface NodeMigration {
   /**
-   * Helper function for migrating a document as a whole
-   * @param doc - The document currently being processed
-   * @param context - The {@link MigrationContext} instance
-   */
-  document?: <Doc extends SanityDocument>(
-    doc: Doc,
-    context: MigrationContext,
-  ) =>
-    | void
-    | DocumentMigrationReturnValue
-    | Transaction
-    | Promise<DocumentMigrationReturnValue | Transaction>
-
-  /**
-   * Helper function that will be called for each node in each document included in the migration
-   * @param node - The node currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
-   * @param context - The {@link MigrationContext} instance
-   */
-  node?: <Node extends JsonValue>(
-    node: Node,
-    path: Path,
-    context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
-  /**
-   * Helper function that will be called for each object in each document included in the migration
-   * @param object - The object value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
-   * @param context - The {@link MigrationContext} instance
-   */
-  object?: <Node extends JsonObject>(
-    node: Node,
-    path: Path,
-    context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
-  /**
    * Helper function that will be called for each array in each document included in the migration
    * @param object - The object value currently being visited
    * @param path - The path to the node within the document. See {@link Path}
@@ -185,32 +145,7 @@ export interface NodeMigration {
     node: Node,
     path: Path,
     context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
-  /**
-   * Helper function that will be called for each string in each document included in the migration
-   * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
-   * @param context - The {@link MigrationContext} instance
-   */
-  string?: <Node extends string>(
-    node: Node,
-    path: Path,
-    context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
-  /**
-   * Helper function that will be called for each number in each document included in the migration
-   * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
-   * @param context - The {@link MigrationContext} instance
-   */
-  number?: <Node extends number>(
-    node: Node,
-    path: Path,
-    context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
   /**
    * Helper function that will be called for each boolean value in each document included in the migration
    * @param string - The string value currently being visited
@@ -221,8 +156,31 @@ export interface NodeMigration {
     node: Node,
     path: Path,
     context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
-
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
+  /**
+   * Helper function for migrating a document as a whole
+   * @param doc - The document currently being processed
+   * @param context - The {@link MigrationContext} instance
+   */
+  document?: <Doc extends SanityDocument>(
+    doc: Doc,
+    context: MigrationContext,
+  ) =>
+    | DocumentMigrationReturnValue
+    | Promise<DocumentMigrationReturnValue | Transaction>
+    | Transaction
+    | void
+  /**
+   * Helper function that will be called for each node in each document included in the migration
+   * @param node - The node currently being visited
+   * @param path - The path to the node within the document. See {@link Path}
+   * @param context - The {@link MigrationContext} instance
+   */
+  node?: <Node extends JsonValue>(
+    node: Node,
+    path: Path,
+    context: MigrationContext,
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
   /**
    * Helper function that will be called for each `null` value in each document included in the migration
    * @param string - The string value currently being visited
@@ -233,5 +191,40 @@ export interface NodeMigration {
     node: Node,
     path: Path,
     context: MigrationContext,
-  ) => void | NodeMigrationReturnValue | Promise<void | NodeMigrationReturnValue>
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
+  /**
+   * Helper function that will be called for each number in each document included in the migration
+   * @param string - The string value currently being visited
+   * @param path - The path to the node within the document. See {@link Path}
+   * @param context - The {@link MigrationContext} instance
+   */
+  number?: <Node extends number>(
+    node: Node,
+    path: Path,
+    context: MigrationContext,
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
+  /**
+   * Helper function that will be called for each object in each document included in the migration
+   * @param object - The object value currently being visited
+   * @param path - The path to the node within the document. See {@link Path}
+   * @param context - The {@link MigrationContext} instance
+   */
+  object?: <Node extends JsonObject>(
+    node: Node,
+    path: Path,
+    context: MigrationContext,
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
+  /**
+   * Helper function that will be called for each string in each document included in the migration
+   * @param string - The string value currently being visited
+   * @param path - The path to the node within the document. See {@link Path}
+   * @param context - The {@link MigrationContext} instance
+   */
+  string?: <Node extends string>(
+    node: Node,
+    path: Path,
+    context: MigrationContext,
+  ) => NodeMigrationReturnValue | Promise<NodeMigrationReturnValue | void> | void
 }
+
+export {type Path} from '@sanity/types'

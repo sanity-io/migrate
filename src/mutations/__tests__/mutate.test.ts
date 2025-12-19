@@ -1,25 +1,25 @@
 import {expect, test} from 'vitest'
 
-import {at, create, createIfNotExists, createOrReplace, del, patch} from '../creators'
-import {inc, insert, set, setIfMissing, unset} from '../operations/creators'
+import {at, create, createIfNotExists, createOrReplace, del, patch} from '../creators.js'
+import {inc, insert, set, setIfMissing, unset} from '../operations/creators.js'
 
 test('single patch mutation', () => {
   expect(patch('cat', at(['title'], set('hello world')))).toStrictEqual({
     id: 'cat',
-    type: 'patch',
     patches: [
       {
-        path: ['title'],
         op: {type: 'set', value: 'hello world'},
+        path: ['title'],
       },
     ],
+    type: 'patch',
   })
 })
 
 test('single create mutation', () => {
   expect(create({_id: 'cat', _type: 'hello'})).toStrictEqual({
-    type: 'create',
     document: {_id: 'cat', _type: 'hello'},
+    type: 'create',
   })
 })
 
@@ -27,7 +27,6 @@ test('two patch mutations', () => {
   expect(
     patch('cat', [at(['title'], set('hello world')), at(['subtitle'], set('nice to see you'))]),
   ).toStrictEqual({
-    type: 'patch',
     id: 'cat',
     patches: [
       {
@@ -45,23 +44,24 @@ test('two patch mutations', () => {
         path: ['subtitle'],
       },
     ],
+    type: 'patch',
   })
 })
 
 test('single patch with revision', () => {
   expect(patch('cat', at(['title'], set('hello world')), {ifRevision: 'rev0'})).toStrictEqual({
-    type: 'patch',
     id: 'cat',
     options: {ifRevision: 'rev0'},
     patches: [
       {
-        path: ['title'],
         op: {
           type: 'set',
           value: 'hello world',
         },
+        path: ['title'],
       },
     ],
+    type: 'patch',
   })
 })
 
@@ -73,29 +73,29 @@ test('multiple mutations', () => {
     }),
   ]).toEqual([
     {
-      type: 'createOrReplace',
       document: {
         _id: 'foo',
         _type: 'lol',
         count: 1,
       },
+      type: 'createOrReplace',
     },
     {
-      type: 'patch',
       id: 'foo',
       options: {
         ifRevision: 'someRev',
       },
       patches: [
         {
-          path: ['title'],
           op: {type: 'set', value: 'hello'},
+          path: ['title'],
         },
         {
+          op: {amount: 2, type: 'inc'},
           path: ['count'],
-          op: {type: 'inc', amount: 2},
         },
       ],
+      type: 'patch',
     },
   ])
 })
@@ -108,33 +108,33 @@ test('multiple ops in a single patch mutation', () => {
     }),
   ]).toEqual([
     {
-      type: 'createIfNotExists',
       document: {
         _id: 'foo',
         _type: 'lol',
         count: 1,
       },
+      type: 'createIfNotExists',
     },
     {
-      type: 'patch',
       id: 'foo',
       options: {ifRevision: 'someRev'},
       patches: [
         {
-          path: ['title'],
           op: {
             type: 'set',
             value: 'hello',
           },
+          path: ['title'],
         },
         {
-          path: ['count'],
           op: {
-            type: 'inc',
             amount: 2,
+            type: 'inc',
           },
+          path: ['count'],
         },
       ],
+      type: 'patch',
     },
   ])
 })
@@ -168,43 +168,45 @@ test('all permutations', () => {
 
   expect(mutations).toEqual([
     {
-      type: 'create',
       document: {
         _id: 'foo',
         _type: 'foo',
         count: 0,
       },
+      type: 'create',
     },
     {
-      type: 'createIfNotExists',
       document: {
         _id: 'bar',
         _type: 'bar',
         count: 1,
       },
+      type: 'createIfNotExists',
     },
     {
-      type: 'createOrReplace',
       document: {
         _id: 'baz',
         _type: 'baz',
         count: 2,
       },
+      type: 'createOrReplace',
     },
     {
-      type: 'patch',
       id: 'qux',
+      options: {
+        ifRevision: 'someRev',
+      },
       patches: [
         {
-          path: ['title'],
           op: {
             type: 'set',
             value: 'hello',
           },
+          path: ['title'],
         },
         {
-          path: ['items'],
           op: {type: 'setIfMissing', value: []},
+          path: ['items'],
         },
         {
           op: {
@@ -215,60 +217,58 @@ test('all permutations', () => {
           },
           path: ['items'],
         },
-        {path: ['title'], op: {type: 'unset'}},
-        {path: ['count'], op: {amount: 2, type: 'inc'}},
+        {op: {type: 'unset'}, path: ['title']},
+        {op: {amount: 2, type: 'inc'}, path: ['count']},
       ],
-      options: {
-        ifRevision: 'someRev',
-      },
+      type: 'patch',
     },
     {
-      type: 'patch',
       id: 'quux',
       patches: [
         {
-          path: ['title'],
           op: {
             type: 'set',
             value: 'hello',
           },
+          path: ['title'],
         },
         {
-          path: ['items'],
           op: {
             type: 'setIfMissing',
             value: [],
           },
+          path: ['items'],
         },
         {
-          path: ['items'],
           op: {
-            type: 'insert',
+            items: [1, 2, 3],
             position: 'after',
             referenceItem: 0,
-            items: [1, 2, 3],
+            type: 'insert',
           },
+          path: ['items'],
         },
         {
-          path: ['title'],
           op: {type: 'unset'},
+          path: ['title'],
         },
         {
-          path: ['count'],
           op: {
-            type: 'inc',
             amount: 2,
+            type: 'inc',
           },
+          path: ['count'],
         },
       ],
+      type: 'patch',
     },
     {
-      type: 'delete',
       id: 'quuz',
+      type: 'delete',
     },
     {
-      type: 'delete',
       id: 'corge',
+      type: 'delete',
     },
   ])
 })

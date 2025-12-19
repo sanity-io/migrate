@@ -1,7 +1,8 @@
-/* eslint-disable no-bitwise */
-import {BufferList} from './BufferList'
-import * as headers from './headers'
-import {type TarHeader} from './headers'
+import {ReadableStream} from 'node:stream/web'
+
+import {BufferList} from './BufferList.js'
+import * as headers from './headers.js'
+import {type TarHeader} from './headers.js'
 
 // Inspired by
 // - https://github.com/alanshaw/it-tar/blob/master/src/extract.ts
@@ -17,8 +18,8 @@ const emptyReadableStream = () =>
 export function untar(
   stream: ReadableStream<Uint8Array>,
   options: {
-    filenameEncoding?: BufferEncoding
     allowUnknownFormat?: boolean
+    filenameEncoding?: BufferEncoding
   } = {},
 ): ReadableStream<[header: TarHeader, entry: ReadableStream<Uint8Array>]> {
   const buffer = new BufferList()
@@ -44,7 +45,7 @@ export function untar(
 
       const header = headers.decode(
         headerChunk,
-        options.filenameEncoding ?? 'utf-8',
+        options.filenameEncoding ?? 'utf8',
         options.allowUnknownFormat ?? false,
       )
       if (header) {
