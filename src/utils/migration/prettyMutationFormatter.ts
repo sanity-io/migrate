@@ -1,12 +1,12 @@
 import {isatty} from 'node:tty'
 
+import {convertToTree, formatTree, maxKeyLength} from '@sanity/cli-core'
 import {type KeyedSegment} from '@sanity/types'
 import chalk from 'chalk'
 
 import {Transaction} from '../../mutations/transaction.js'
 import {Mutation, NodePatch} from '../../mutations/types.js'
 import {Migration} from '../../types.js'
-import {convertToTree, formatTree, maxKeyLength} from '../tree.js'
 
 type ItemRef = number | string
 type Impact = 'destructive' | 'incremental' | 'maybeDestructive'
@@ -189,7 +189,7 @@ function formatPatchMutation(patch: NodePatch): string {
     return `${chalk.red(formattedType)}(${op.startIndex}, ${op.endIndex})`
   }
 
-  throw new Error(`Invalid operation type: ${op.type}`)
+  throw new Error(`Invalid operation type: ${(op as {type: string}).type}`)
 }
 
 function indent(subject: string, size = 2): string {

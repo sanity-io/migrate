@@ -161,7 +161,7 @@ export class CreateMigrationCommand extends SanityCommand<typeof CreateMigration
       message: 'Select a template',
     })
 
-    return templatesByName[templateName]
+    return templatesByName[templateName]!
   }
 
   private async promptForTitle(providedTitle?: string): Promise<string> {

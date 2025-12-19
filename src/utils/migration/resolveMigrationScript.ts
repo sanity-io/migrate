@@ -13,7 +13,6 @@ interface ResolvedMigrationScript {
    * Absolute path to the migration script
    */
   absolutePath: string
-
   /**
    * Relative path from the working directory to the migration script
    */

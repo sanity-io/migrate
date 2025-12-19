@@ -42,17 +42,16 @@ vi.mock('../../../../../cli-core/src/services/apiClient.js', () => ({
   getProjectCliClient: mocks.getProjectCliClient,
 }))
 
-vi.mock('@sanity/migrate', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@sanity/migrate')>()
-  return {
-    ...actual,
-    dryRun: mocks.dryRun,
-    run: mocks.run,
-  }
-})
+vi.mock(import('../../../runner/dryRun.js'), () => ({
+  dryRun: mocks.dryRun,
+}))
 
-vi.mock('../../../utils/migration/resolveMigrationScript.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@sanity/migrate')>()
+vi.mock(import('../../../runner/run.js'), () => ({
+  run: mocks.run,
+}))
+
+vi.mock(import('../../../utils/migration/resolveMigrationScript.js'), async (importOriginal) => {
+  const actual = await importOriginal()
   return {
     ...actual,
     resolveMigrationScript: mocks.resolveMigrationScript,
@@ -135,7 +134,7 @@ describe('#migration:run', () => {
 
   test('--help works', async () => {
     const {stdout} = await runCommand(['migration run', '--help'])
-    expect(stdout).toMatchInlineSnapshot(`
+    expect(stdout).toMatchInlineSnapshot(String.raw`
       "Run a migration against a dataset
 
       USAGE
@@ -179,7 +178,7 @@ describe('#migration:run', () => {
 
         execute the migration using a dataset export as the source
 
-          $ sanity migration run <id> --from-export=production.tar.gz --no-dry-run \\
+          $ sanity migration run <id> --from-export=production.tar.gz --no-dry-run \
             --project xyz --dataset staging
 
       "
