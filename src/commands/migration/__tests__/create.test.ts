@@ -120,7 +120,7 @@ describe('#migration:create', () => {
 
     await testCommand(CreateMigrationCommand)
 
-    expect(mockInput.mock.calls[1][0]).toStrictEqual({
+    expect(mockInput.mock.calls[1]?.[0]).toStrictEqual({
       message:
         'Type of documents to migrate. You can add multiple types separated by comma (optional)',
     })
