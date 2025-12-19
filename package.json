@@ -1,6 +1,6 @@
 {
   "name": "@sanity/migrate",
-  "version": "5.0.1",
+  "version": "5.0.2-alpha.0",
   "description": "Tooling for running data migrations on Sanity.io projects",
   "keywords": [
     "sanity",
@@ -13,12 +13,11 @@
   ],
   "homepage": "https://www.sanity.io/",
   "bugs": {
-    "url": "https://github.com/sanity-io/sanity/issues"
+    "url": "https://github.com/sanity-io/migrate/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sanity-io/sanity.git",
-    "directory": "packages/@sanity/migrate"
+    "url": "git+https://github.com/sanity-io/migrate.git"
   },
   "license": "MIT",
   "author": "Sanity.io <hello@sanity.io>",
@@ -42,6 +41,7 @@
   "scripts": {
     "_postbuild": "oclif manifest",
     "build": "swc src -d dist --strip-leading-paths && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build:types": "tsc --project tsconfig.build.json",
     "clean": "rimraf dist node_modules",
     "coverage": "vitest run --coverage",
     "dev": "tsc --watch",
@@ -106,5 +106,8 @@
   "packageManager": "pnpm@10.26.0",
   "engines": {
     "node": ">=20.19 <22 || >=22.12"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
