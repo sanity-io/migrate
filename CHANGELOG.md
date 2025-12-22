@@ -3,26 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [5.2.1-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.2.0-alpha.0...migrate-v5.2.1-alpha.0) (2025-12-24)
+## [5.1.0](https://github.com/sanity-io/sanity/compare/v5.0.1...v5.1.0) (2025-12-22)
 
-
-### Bug Fixes
-
-* imports in the migration templates ([#10](https://github.com/sanity-io/migrate/issues/10)) ([ab0f5be](https://github.com/sanity-io/migrate/commit/ab0f5be74d144e98765f96fcc1bc4495291c5e0a))
-
-## [5.2.0-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.1-alpha.0...migrate-v5.2.0-alpha.0) (2025-12-24)
-
-
-### Features
-
-* add migration commands ([#2](https://github.com/sanity-io/migrate/issues/2)) ([fedee99](https://github.com/sanity-io/migrate/commit/fedee991d2b904221c64758431ad5e68c7a548d6))
-
-## [5.1.1-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.0-alpha.0...migrate-v5.1.1-alpha.0) (2025-12-22)
-
-
-### Bug Fixes
-
-* fixes build and linting issues ([#1](https://github.com/sanity-io/migrate/issues/1)) ([79a4450](https://github.com/sanity-io/migrate/commit/79a44501f5c45cc84864fd0e320dc1bed0e19f4c))
+**Note:** Version bump only for package @sanity/migrate
 
 ## [5.0.1](https://github.com/sanity-io/sanity/compare/v5.0.0...v5.0.1) (2025-12-17)
 
