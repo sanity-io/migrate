@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.1-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.0-alpha.0...migrate-v5.1.1-alpha.0) (2025-12-22)
+
+
+### Bug Fixes
+
+* fixes build and linting issues ([#1](https://github.com/sanity-io/migrate/issues/1)) ([79a4450](https://github.com/sanity-io/migrate/commit/79a44501f5c45cc84864fd0e320dc1bed0e19f4c))
+
 ## [5.0.1](https://github.com/sanity-io/sanity/compare/v5.0.0...v5.0.1) (2025-12-17)
 
 ### Bug Fixes
