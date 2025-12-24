@@ -263,15 +263,6 @@ export default defineConfig(
           alwaysTryTypes: true,
         },
       },
-      // 'import/resolver-next': [
-      //   createTypeScriptImportResolver({
-      //     alwaysTryTypes: true,
-      //     extensions: ['.js', '.jsx', '.ts', 'tsx', '.mjs', '.mts'],
-
-      //     // use an array of glob patterns
-      //     project: ['packages/*/tsconfig.json', 'examples/*/tsconfig.json'],
-      //   }),
-      // ],
     },
   },
   prettier,
