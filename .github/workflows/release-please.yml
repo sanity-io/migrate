@@ -84,8 +84,9 @@ jobs:
 
       - name: Publish packages
         if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
-        # TODO: Remove the tag once we have a proper release
-        run: pnpm publish --tag beta
+        run: pnpm publish
+        env:
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Summary
         if: ${{ steps.release.outputs.releases_created == 'true' || github.event.inputs.publish == 'true' }}
