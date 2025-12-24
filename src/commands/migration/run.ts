@@ -1,9 +1,8 @@
 import path from 'node:path'
 
-import {confirm} from '@inquirer/prompts'
 import {Args, Flags} from '@oclif/core'
-import {SanityCommand, spinner, subdebug} from '@sanity/cli-core'
-import chalk from 'chalk'
+import {SanityCommand, subdebug} from '@sanity/cli-core'
+import {chalk, confirm, spinner} from '@sanity/cli-core/ux'
 import {Table} from 'console-table-printer'
 
 import {getMigrationRootDirectory} from '../../actions/migration/getMigrationRootDirectory.js'

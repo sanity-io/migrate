@@ -20,3 +20,5 @@ mutations.js
 
 .vscode
 .claude
+
+oclif.manifest.json

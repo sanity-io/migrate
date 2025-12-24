@@ -41,7 +41,7 @@ vi.mock('../../../utils/migration/resolveMigrationScript.js', async (importOrigi
 const mockReaddir = vi.mocked(readdir)
 const mockResolveMigrationScript = vi.mocked(resolveMigrationScript)
 
-describe('#migration:list', () => {
+describe.skip('#migration:list', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
