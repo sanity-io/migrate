@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.0-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.1-alpha.0...migrate-v5.2.0-alpha.0) (2025-12-24)
+
+
+### Features
+
+* add migration commands ([#2](https://github.com/sanity-io/migrate/issues/2)) ([fedee99](https://github.com/sanity-io/migrate/commit/fedee991d2b904221c64758431ad5e68c7a548d6))
+
 ## [5.1.1-alpha.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.0-alpha.0...migrate-v5.1.1-alpha.0) (2025-12-22)
 
 
