@@ -26,11 +26,11 @@
   "exports": {
     ".": {
       "source": "./src/_exports/index.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/_exports/index.js"
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
+  "main": "./dist/_exports/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
     "sanity": "./bin/run.js"
@@ -42,9 +42,10 @@
     "src"
   ],
   "scripts": {
-    "build": "swc src -d dist --strip-leading-paths && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build": "swc src -d dist --strip-leading-paths && pnpm run build:types",
     "postbuild": "oclif manifest",
-    "build:types": "tsc --project tsconfig.build.json",
+    "build:api": "api-extractor run --local --verbose",
+    "build:types": "tsc --project tsconfig.build.json && pnpm run build:api",
     "clean": "rimraf dist node_modules",
     "coverage": "vitest run --coverage",
     "dev": "tsc --watch",
@@ -87,6 +88,7 @@
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.36.0",
+    "@microsoft/api-extractor": "^7.55.2",
     "@oclif/test": "^4.1.15",
     "@stylistic/eslint-plugin": "^5.6.1",
     "@swc/cli": "^0.7.9",
