@@ -14,12 +14,18 @@ import {createContextClient} from './utils/createContextClient.js'
 import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient.js'
 import {createBufferFile} from './utils/getBufferFile.js'
 
-interface MigrationRunnerOptions {
+/**
+ * @public
+ */
+export interface MigrationRunnerOptions {
   api: APIConfig
 
   exportPath?: string
 }
 
+/**
+ * @public
+ */
 export async function* dryRun(config: MigrationRunnerOptions, migration: Migration) {
   const source = config.exportPath
     ? fromExportArchive(config.exportPath)

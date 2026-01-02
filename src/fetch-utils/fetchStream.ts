@@ -1,5 +1,8 @@
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
+/**
+ * @public
+ */
 export interface FetchOptions {
   init: RequestInit
   url: string | URL

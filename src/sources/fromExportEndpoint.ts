@@ -6,6 +6,9 @@ import {fetchStream} from '../fetch-utils/fetchStream.js'
 import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
 import {type ExportAPIConfig} from '../types.js'
 
+/**
+ * @public
+ */
 export function fromExportEndpoint(options: ExportAPIConfig) {
   return fetchStream(
     toFetchOptions({
@@ -24,7 +27,7 @@ export function fromExportEndpoint(options: ExportAPIConfig) {
  *
  * This may occur when streaming NDJSON from the Export HTTP API.
  *
- * @internal
+ * @public
  * @see {@link https://github.com/sanity-io/sanity/pull/1787 | Initial pull request}
  */
 export const safeJsonParser = createSafeJsonParser<SanityDocument>({

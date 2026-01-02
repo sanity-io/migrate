@@ -1,3 +1,6 @@
+/**
+ * @public
+ */
 export async function* split(
   it: AsyncIterableIterator<string>,
   delimiter: string,
