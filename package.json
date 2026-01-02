@@ -44,7 +44,7 @@
     "!src/**/*.tar.gz"
   ],
   "scripts": {
-    "build": "swc src -d dist --strip-leading-paths && pnpm run build:types",
+    "build": "swc --delete-dir-on-start src -d dist --strip-leading-paths && pnpm run build:types",
     "postbuild": "oclif manifest",
     "build:api": "api-extractor run --local --verbose",
     "build:types": "tsc --project tsconfig.build.json && pnpm run build:api",

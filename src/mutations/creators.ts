@@ -18,6 +18,7 @@ import {type NormalizeReadOnlyArray, type Optional, type Tuplify} from './typeUt
 
 /**
  * Creates a new document.
+ * @public
  * @param document - The document to be created.
  * @returns The mutation to create the document.
  */
@@ -29,6 +30,7 @@ export function create<Doc extends Optional<SanityDocument, '_id'>>(
 
 /**
  * Applies a patch to a document.
+ * @public
  * @param id - The ID of the document to be patched.
  * @param patches - The patches to be applied.
  * @param options - Optional patch options.
@@ -50,6 +52,7 @@ export function patch<P extends NodePatch | NodePatchList>(
 
 /**
  * Creates a {@link NodePatch} at a specific path.
+ * @public
  * @param path - The path where the operation should be applied.
  * @param operation - The operation to be applied.
  * @returns The node patch.
@@ -63,6 +66,7 @@ export function at<O extends Operation>(path: Path | string, operation: O): Node
 
 /**
  * Creates a document if it does not exist.
+ * @public
  * @param document - The document to be created.
  * @returns The mutation operation to create the document if it does not exist.
  */
@@ -74,6 +78,7 @@ export function createIfNotExists<Doc extends SanityDocument>(
 
 /**
  * Creates or replaces a document.
+ * @public
  * @param document - The document to be created or replaced.
  * @returns The mutation operation to create or replace the document.
  */
@@ -85,6 +90,7 @@ export function createOrReplace<Doc extends SanityDocument>(
 
 /**
  * Deletes a document.
+ * @public
  * @param id - The id of the document to be deleted.
  * @returns The mutation operation to delete the document.
  */
@@ -94,5 +100,6 @@ export function delete_(id: string): DeleteMutation {
 
 /**
  * Alias for delete
+ * @public
  */
 export const del = delete_

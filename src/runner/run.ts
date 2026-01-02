@@ -34,6 +34,9 @@ import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClie
 import {createBufferFile} from './utils/getBufferFile.js'
 import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations.js'
 
+/**
+ * @public
+ */
 export interface MigrationRunnerConfig {
   api: APIConfig
 
@@ -41,6 +44,9 @@ export interface MigrationRunnerConfig {
   onProgress?: (event: MigrationProgress) => void
 }
 
+/**
+ * @public
+ */
 export async function* toFetchOptionsIterable(
   apiConfig: APIConfig,
   mutations: AsyncIterableIterator<TransactionPayload>,
@@ -62,6 +68,9 @@ export async function* toFetchOptionsIterable(
   }
 }
 
+/**
+ * @public
+ */
 export async function run(config: MigrationRunnerConfig, migration: Migration) {
   const stats: MigrationProgress = {
     completedTransactions: [],
