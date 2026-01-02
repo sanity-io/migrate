@@ -1,3 +1,6 @@
+/**
+ * @public
+ */
 export async function* map<T, U>(
   it: AsyncIterableIterator<T>,
   project: (value: T) => U,

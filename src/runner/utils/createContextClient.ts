@@ -10,7 +10,10 @@ export function createContextClient(config: Parameters<typeof createClient>[0]):
   )
 }
 
-const ALLOWED_PROPERTIES = [
+/**
+ * @public
+ */
+export const ALLOWED_PROPERTIES = [
   'fetch',
   'clone',
   'config',
@@ -21,8 +24,14 @@ const ALLOWED_PROPERTIES = [
   'projects',
 ] as const
 
-type AllowedMethods = (typeof ALLOWED_PROPERTIES)[number]
+/**
+ * @public
+ */
+export type AllowedMethods = (typeof ALLOWED_PROPERTIES)[number]
 
+/**
+ * @public
+ */
 export type RestrictedClient = Pick<SanityClient, AllowedMethods>
 
 function restrictClient(client: SanityClient): RestrictedClient {

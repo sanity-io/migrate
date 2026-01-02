@@ -28,6 +28,9 @@ function wrapDocumentsIteratorProducer(factory: () => AsyncIterableIterator<Sani
   return documents
 }
 
+/**
+ * @public
+ */
 export function collectMigrationMutations(
   migration: Migration,
   documents: () => AsyncIterableIterator<SanityDocument>,

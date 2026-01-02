@@ -7,6 +7,9 @@ import {type RestrictedClient} from './runner/utils/createContextClient.js'
 
 export type * from './json.js'
 
+/**
+ * @public
+ */
 export type AsyncIterableMigration = (
   documents: () => AsyncIterableIterator<SanityDocument>,
   context: MigrationContext,
@@ -71,9 +74,8 @@ export interface MigrationContext {
 export type MigrateDefinition = AsyncIterableMigration | NodeMigration
 
 /**
- * Migration progress, only used internally (for now)
- * @internal
- * @hidden
+ * Migration progress
+ * @public
  */
 export type MigrationProgress = {
   completedTransactions: MultipleMutationResult[]
@@ -87,8 +89,7 @@ export type MigrationProgress = {
 
 /**
  * API configuration for the migration runner
- * @internal
- * @hidden
+ * @public
  */
 export interface APIConfig {
   apiVersion: 'vX' | `v${number}-${number}-${number}`
@@ -101,8 +102,7 @@ export interface APIConfig {
 
 /**
  * API configuration for exports
- * @internal
- * @hidden
+ * @public
  */
 export interface ExportAPIConfig extends APIConfig {
   documentTypes?: string[]
@@ -138,7 +138,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each array in each document included in the migration
    * @param object - The object value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   array?: <Node extends JsonArray>(
@@ -149,7 +149,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each boolean value in each document included in the migration
    * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   boolean?: <Node extends boolean>(
@@ -173,7 +173,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each node in each document included in the migration
    * @param node - The node currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   node?: <Node extends JsonValue>(
@@ -184,7 +184,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each `null` value in each document included in the migration
    * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   null?: <Node extends null>(
@@ -195,7 +195,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each number in each document included in the migration
    * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   number?: <Node extends number>(
@@ -206,7 +206,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each object in each document included in the migration
    * @param object - The object value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   object?: <Node extends JsonObject>(
@@ -217,7 +217,7 @@ export interface NodeMigration {
   /**
    * Helper function that will be called for each string in each document included in the migration
    * @param string - The string value currently being visited
-   * @param path - The path to the node within the document. See {@link Path}
+   * @param path - The path to the node within the document. See `Path`
    * @param context - The {@link MigrationContext} instance
    */
   string?: <Node extends string>(

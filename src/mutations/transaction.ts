@@ -1,5 +1,8 @@
 import {type Mutation} from './types.js'
 
+/**
+ * @public
+ */
 export interface Transaction {
   mutations: Mutation[]
   type: 'transaction'
@@ -19,6 +22,9 @@ export interface Transaction {
  * {@link https://www.sanity.io/docs/http-mutations#afccc1b9ef78}
  */
 export function transaction(transactionId: string, mutations: Mutation[]): Transaction
+/**
+ * @public
+ */
 export function transaction(mutations: Mutation[]): Transaction
 export function transaction(
   idOrMutations: Mutation[] | string,

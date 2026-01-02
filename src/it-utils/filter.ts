@@ -1,3 +1,6 @@
+/**
+ * @public
+ */
 export async function* filter<T>(
   it: AsyncIterableIterator<T>,
   predicate: (value: T) => boolean | Promise<boolean>,

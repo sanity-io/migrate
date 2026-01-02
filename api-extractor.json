@@ -29,6 +29,9 @@
       }
     },
     "extractorMessageReporting": {
+      "ae-internal-missing-underscore": {
+        "logLevel": "none"
+      },
       "default": {
         "logLevel": "warning"
       }

@@ -5,6 +5,9 @@ import arrify from 'arrify'
 import {isTransaction} from '../../mutations/asserters.js'
 import {type Mutation, type Transaction} from '../../mutations/index.js'
 
+/**
+ * @public
+ */
 export interface TransactionPayload {
   mutations: SanityMutation[]
 
