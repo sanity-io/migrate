@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.1](https://github.com/sanity-io/migrate/compare/migrate-v5.2.0...migrate-v5.2.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* fixes issues with package paths and rename bin ([#16](https://github.com/sanity-io/migrate/issues/16)) ([5b8333c](https://github.com/sanity-io/migrate/commit/5b8333c5c62e4e27197ea6fd83797871490e479a))
+
 ## [5.2.0](https://github.com/sanity-io/migrate/compare/migrate-v5.1.0...migrate-v5.2.0) (2025-12-24)
 
 
