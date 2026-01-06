@@ -4,6 +4,9 @@ import {drain} from '../tar-webstream/drain.js'
 import {untar} from '../tar-webstream/untar.js'
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
 
+/**
+ * @public
+ */
 export async function* fromExportArchive(path: string): AsyncGenerator<Uint8Array, void, unknown> {
   for await (const [header, entry] of streamToAsyncIterator(
     untar(await maybeDecompress(readFileAsWebStream(path))),
