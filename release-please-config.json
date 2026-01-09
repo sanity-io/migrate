@@ -57,7 +57,6 @@
     ".": {
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
-      "component": "migrate",
       "release-type": "node"
     }
   }
