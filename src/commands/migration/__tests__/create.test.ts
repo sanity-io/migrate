@@ -1,14 +1,14 @@
 import {access, mkdir, writeFile} from 'node:fs/promises'
 
 import {runCommand} from '@oclif/test'
+import {findProjectRoot} from '@sanity/cli-core'
 import {testCommand} from '@sanity/cli-test'
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest'
+import {afterEach, describe, expect, test, vi} from 'vitest'
 
 import {CreateMigrationCommand} from '../create.js'
 
 const mocks = vi.hoisted(() => ({
   confirm: vi.fn(),
-  findProjectRoot: vi.fn(),
   input: vi.fn(),
   select: vi.fn(),
 }))
@@ -39,28 +39,40 @@ vi.mock('@sanity/cli-core/ux', async (importOriginal) => {
   }
 })
 
-vi.mock('../../../../../cli-core/src/config/findProjectRoot.js', () => ({
-  findProjectRoot: mocks.findProjectRoot,
+const mockProjectRoot = vi.hoisted(() => ({
+  directory: '/test/path',
+  path: '/test/path/sanity.config.ts',
+  type: 'studio' as const,
 }))
+
+vi.mock('@sanity/cli-core', async () => {
+  const actual = await vi.importActual('@sanity/cli-core')
+  return {
+    ...actual,
+    findProjectRoot: vi.fn().mockResolvedValue(mockProjectRoot),
+  }
+})
+
+const defaultMocks = {
+  cliConfig: {
+    api: {
+      projectId: 'test-project',
+    },
+  },
+  projectRoot: mockProjectRoot,
+}
 
 vi.mock('../../../actions/migration/templates/index.js', () => mockTemplates)
 
 const mockConfirm = mocks.confirm
-const mockFindProjectRoot = mocks.findProjectRoot
+const mockFindProjectRoot = vi.mocked(findProjectRoot)
 const mockInput = mocks.input
 const mockSelect = mocks.select
 const mockAccess = vi.mocked(access)
 const mockMkdir = vi.mocked(mkdir)
 const mockWriteFile = vi.mocked(writeFile)
 
-describe.skip('#migration:create', () => {
-  beforeEach(() => {
-    mockFindProjectRoot.mockResolvedValue({
-      directory: '/test/path',
-      root: '/test/path',
-      type: 'studio',
-    })
-  })
+describe('#migration:create', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -94,7 +106,9 @@ describe.skip('#migration:create', () => {
   })
 
   test('prompts user to enter title when no title argument is provided', async () => {
-    await testCommand(CreateMigrationCommand)
+    await testCommand(CreateMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     expect(mockInput).toHaveBeenCalledWith({
       message: 'Title of migration (e.g. "Rename field from location to address")',
@@ -103,7 +117,9 @@ describe.skip('#migration:create', () => {
   })
 
   test('skips title prompt when title is provided', async () => {
-    await testCommand(CreateMigrationCommand, ['Migration Title'])
+    await testCommand(CreateMigrationCommand, ['Migration Title'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockInput).toHaveBeenCalledWith({
       message:
@@ -112,9 +128,11 @@ describe.skip('#migration:create', () => {
   })
 
   test('errors gracefully if findProjectRoot fails', async () => {
-    mockFindProjectRoot.mockRejectedValue(new Error('No project root found'))
+    mockFindProjectRoot.mockRejectedValueOnce(new Error('No project root found'))
 
-    const {error} = await testCommand(CreateMigrationCommand, ['Migration Title'])
+    const {error} = await testCommand(CreateMigrationCommand, ['Migration Title'], {
+      mocks: defaultMocks,
+    })
 
     expect(error?.message).toContain('No project root found')
   })
@@ -122,7 +140,9 @@ describe.skip('#migration:create', () => {
   test('prompts user for type of documents for migration after a valid migration name has been entered', async () => {
     mockInput.mockResolvedValueOnce('Migration Title')
 
-    await testCommand(CreateMigrationCommand)
+    await testCommand(CreateMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     expect(mockInput.mock.calls[1]?.[0]).toStrictEqual({
       message:
@@ -133,7 +153,9 @@ describe.skip('#migration:create', () => {
   test('prompts user for template selection after migration name and optional document types', async () => {
     mockInput.mockResolvedValueOnce('document-1, document-2, document-3')
 
-    await testCommand(CreateMigrationCommand, ['Migration Title'])
+    await testCommand(CreateMigrationCommand, ['Migration Title'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockSelect).toHaveBeenCalledWith({
       choices: [
@@ -167,7 +189,9 @@ describe.skip('#migration:create', () => {
     mockSelect.mockResolvedValue('Rename a field')
     mockAccess.mockRejectedValue(new Error('ENOENT: no such file or directory'))
 
-    await testCommand(CreateMigrationCommand, ['Migration Title'])
+    await testCommand(CreateMigrationCommand, ['Migration Title'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockMkdir).toHaveBeenCalledWith(
       expect.stringContaining('/test/path/migrations/migration-title'),
@@ -184,7 +208,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockConfirm.mockResolvedValue(true)
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockConfirm).toHaveBeenCalledWith({
       default: false,
@@ -201,7 +227,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockConfirm.mockResolvedValue(false)
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockConfirm).toHaveBeenCalled()
     expect(mockMkdir).not.toHaveBeenCalled()
@@ -213,7 +241,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockConfirm.mockResolvedValue(true)
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockConfirm).toHaveBeenCalled()
     expect(mockMkdir).toHaveBeenCalledWith(
@@ -230,7 +260,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockRejectedValue(new Error('Permission denied'))
 
-    const {error} = await testCommand(CreateMigrationCommand, ['My Migration'])
+    const {error} = await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(error).toBeDefined()
     expect(error?.message).toContain('Failed to create migration directory: Permission denied')
@@ -243,7 +275,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    const {stdout} = await testCommand(CreateMigrationCommand, ['My Migration'])
+    const {stdout} = await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockWriteFile).toHaveBeenCalled()
 
@@ -269,7 +303,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockTemplates.minimalSimple).toHaveBeenCalled()
   })
@@ -280,7 +316,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockTemplates.renameType).toHaveBeenCalled()
   })
@@ -291,7 +329,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockTemplates.renameField).toHaveBeenCalled()
   })
@@ -302,7 +342,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockTemplates.stringToPTE).toHaveBeenCalled()
   })
@@ -315,7 +357,9 @@ describe.skip('#migration:create', () => {
     mockAccess.mockResolvedValue()
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
 
-    await testCommand(CreateMigrationCommand, ['My Migration'])
+    await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(mockTemplates.minimalAdvanced).toHaveBeenCalled()
   })
@@ -329,7 +373,9 @@ describe.skip('#migration:create', () => {
     mockMkdir.mockResolvedValue('test/path/migrations/my-migration')
     mockWriteFile.mockRejectedValue(new Error('Permission denied'))
 
-    const {error, stdout} = await testCommand(CreateMigrationCommand, ['My Migration'])
+    const {error, stdout} = await testCommand(CreateMigrationCommand, ['My Migration'], {
+      mocks: defaultMocks,
+    })
 
     expect(error).toBeDefined()
     expect(error?.message).toContain('Failed to create migration file: Permission denied')

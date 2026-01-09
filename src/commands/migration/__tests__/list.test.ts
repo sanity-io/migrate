@@ -12,22 +12,6 @@ vi.mock('node:fs/promises', () => ({
   readdir: vi.fn(),
 }))
 
-vi.mock('../../../../../cli-core/src/config/findProjectRoot.js', () => ({
-  findProjectRoot: vi.fn().mockResolvedValue({
-    directory: '/test/project',
-    root: '/test/project',
-    type: 'studio',
-  }),
-}))
-
-vi.mock('../../../../../cli-core/src/config/cli/getCliConfig.js', () => ({
-  getCliConfig: vi.fn().mockResolvedValue({
-    api: {
-      projectId: 'test-project',
-    },
-  }),
-}))
-
 vi.mock('../../../utils/migration/resolveMigrationScript.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../../utils/migration/resolveMigrationScript.js')>()
@@ -38,10 +22,23 @@ vi.mock('../../../utils/migration/resolveMigrationScript.js', async (importOrigi
   }
 })
 
+const defaultMocks = {
+  cliConfig: {
+    api: {
+      projectId: 'test-project',
+    },
+  },
+  projectRoot: {
+    directory: '/test/project',
+    path: '/test/project/sanity.config.ts',
+    type: 'studio' as const,
+  },
+}
+
 const mockReaddir = vi.mocked(readdir)
 const mockResolveMigrationScript = vi.mocked(resolveMigrationScript)
 
-describe.skip('#migration:list', () => {
+describe('#migration:list', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -122,7 +119,9 @@ describe.skip('#migration:list', () => {
       },
     ])
 
-    const {stdout} = await testCommand(ListMigrationCommand, [])
+    const {stdout} = await testCommand(ListMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     // Verify count
     expect(stdout).toContain('Found 3 migrations in project')
@@ -148,7 +147,9 @@ describe.skip('#migration:list', () => {
     // Mock readdir to return empty array
     mockReaddir.mockResolvedValue([])
 
-    const {stdout} = await testCommand(ListMigrationCommand, [])
+    const {stdout} = await testCommand(ListMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     expect(stdout).toContain('No migrations found in migrations folder of the project')
     expect(stdout).toContain('Run `sanity migration create <NAME>` to create a new migration')
@@ -160,7 +161,9 @@ describe.skip('#migration:list', () => {
     Object.assign(enoentError, {code: 'ENOENT'})
     mockReaddir.mockRejectedValue(enoentError)
 
-    const {stdout} = await testCommand(ListMigrationCommand, [])
+    const {stdout} = await testCommand(ListMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     expect(stdout).toContain('No migrations folder found in the project')
     expect(stdout).toContain('Run `sanity migration create <NAME>` to create a new migration')
@@ -177,7 +180,9 @@ describe.skip('#migration:list', () => {
     // Mock resolveMigrationScript to throw error
     mockResolveMigrationScript.mockRejectedValue(new Error('Syntax error in migration file'))
 
-    const {error} = await testCommand(ListMigrationCommand, [])
+    const {error} = await testCommand(ListMigrationCommand, [], {
+      mocks: defaultMocks,
+    })
 
     expect(error?.message).toContain('List migrations failed')
     expect(error?.message).toContain('Syntax error in migration file')
