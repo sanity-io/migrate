@@ -71,8 +71,8 @@
   "dependencies": {
     "@oclif/core": "^4.8.0",
     "@oclif/plugin-help": "^6.2.36",
-    "@sanity/cli-core": "https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245",
-    "@sanity/cli-test": "https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245",
+    "@sanity/cli-core": "^0.1.0-alpha.5",
+    "@sanity/cli-test": "^0.0.2-alpha.4",
     "@sanity/client": "^7.13.2",
     "@sanity/mutate": "^0.15.0",
     "@sanity/types": "^5.0.1",

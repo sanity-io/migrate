@@ -15,20 +15,20 @@ importers:
         specifier: ^6.2.36
         version: 6.2.36
       '@sanity/cli-core':
-        specifier: https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245
-        version: https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245(@types/node@25.0.3)(@types/react@19.2.7)
+        specifier: ^0.1.0-alpha.5
+        version: 0.1.0-alpha.5(@types/node@25.0.3)(@types/react@19.2.7)
       '@sanity/cli-test':
-        specifier: https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245
-        version: https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245(@oclif/core@4.8.0)(@sanity/cli-core@https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245(@types/node@25.0.3)(@types/react@19.2.7))
+        specifier: ^0.0.2-alpha.4
+        version: 0.0.2-alpha.4(@oclif/core@4.8.0)(@sanity/cli-core@0.1.0-alpha.5(@types/node@25.0.3)(@types/react@19.2.7))
       '@sanity/client':
         specifier: ^7.13.2
-        version: 7.13.2(debug@4.4.3)
+        version: 7.14.0(debug@4.4.3)
       '@sanity/mutate':
         specifier: ^0.15.0
         version: 0.15.0(debug@4.4.3)
       '@sanity/types':
         specifier: ^5.0.1
-        version: 5.0.1(@types/react@19.2.7)(debug@4.4.3)
+        version: 5.2.0(@types/react@19.2.7)(debug@4.4.3)
       '@sanity/util':
         specifier: ^5.0.1
         version: 5.0.1(@types/react@19.2.7)(debug@4.4.3)
@@ -1263,22 +1263,16 @@ packages:
   '@rushstack/ts-command-line@5.1.5':
     resolution: {integrity: sha512-YmrFTFUdHXblYSa+Xc9OO9FsL/XFcckZy0ycQ6q7VSBsVs5P0uD9vcges5Q9vctGlVdu27w+Ct6IuJ458V0cTQ==}
 
-  '@sanity/cli-core@https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245':
-    resolution: {integrity: sha512-Uu9m0I5cc/LgIp2WutYpDCrBR2lt/E7ZvpAun+2t9u+jBplGkCF8Z1E36w0S2SjpFUuj7y+dPDl454CHV8X+tQ==, tarball: https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245}
-    version: 0.1.0-alpha.4
+  '@sanity/cli-core@0.1.0-alpha.5':
+    resolution: {integrity: sha512-iBPF7Sd9Ah/7w7nSu8zC9QoyIa9ecek1JK/QEJ+N/YW7poZMInc+1PyCC3vecB5Ug3SCoAP3McJHOPdFR9PqeA==}
     engines: {node: '>=20.19.1 <22 || >=22.12'}
 
-  '@sanity/cli-test@https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245':
-    resolution: {integrity: sha512-M9LRENrWHxE1EpCpr+r1pxz0jZGGHq+mQyONQFnxxACeL9iPNAbauQ27vM9es+Gu4okVzDWMVAWswzFou+6YKQ==, tarball: https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245}
-    version: 0.0.2-alpha.3
+  '@sanity/cli-test@0.0.2-alpha.4':
+    resolution: {integrity: sha512-9hq6uhtDn2jDYpuec2SQOAPo4/cuZtl8jeHUopgmRchImVVRGAWcZWRcG6o+x3dHgByXqzEcE5bvk02TWiGVcA==}
     engines: {node: '>=20.19.1 <22 || >=22.12'}
     peerDependencies:
       '@oclif/core': ^4.0.0
-      '@sanity/cli-core': 0.1.0-alpha.4
-
-  '@sanity/client@7.13.2':
-    resolution: {integrity: sha512-bXuQGWgrpkSInZy8lfCMmOgdTNpsoZ7PORW0+zXss8qVpNo1DC002l1c8to6kfxNF0OaL9v7LwsPqKcTZ/VWrw==}
-    engines: {node: '>=20'}
+      '@sanity/cli-core': 0.1.0-alpha.5
 
   '@sanity/client@7.14.0':
     resolution: {integrity: sha512-eXue3rc4MqJh89mvuTC0h0pdoY8lwXjlV8odFB3EF7aSFKF7F5BL0NU2mlTrCZYbPAlV3JTvMPPLGJCORqOKDw==}
@@ -5699,7 +5693,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@sanity/cli-core@https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245(@types/node@25.0.3)(@types/react@19.2.7)':
+  '@sanity/cli-core@0.1.0-alpha.5(@types/node@25.0.3)(@types/react@19.2.7)':
     dependencies:
       '@inquirer/prompts': 8.1.0(@types/node@25.0.3)
       '@oclif/core': 4.8.0
@@ -5737,21 +5731,12 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@sanity/cli-test@https://pkg.pr.new/sanity-io/cli/@sanity/cli-test@245(@oclif/core@4.8.0)(@sanity/cli-core@https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245(@types/node@25.0.3)(@types/react@19.2.7))':
+  '@sanity/cli-test@0.0.2-alpha.4(@oclif/core@4.8.0)(@sanity/cli-core@0.1.0-alpha.5(@types/node@25.0.3)(@types/react@19.2.7))':
     dependencies:
       '@oclif/core': 4.8.0
-      '@sanity/cli-core': https://pkg.pr.new/sanity-io/cli/@sanity/cli-core@245(@types/node@25.0.3)(@types/react@19.2.7)
+      '@sanity/cli-core': 0.1.0-alpha.5(@types/node@25.0.3)(@types/react@19.2.7)
       ansis: 4.2.0
       nock: 14.0.10
-
-  '@sanity/client@7.13.2(debug@4.4.3)':
-    dependencies:
-      '@sanity/eventsource': 5.0.2
-      get-it: 8.7.0(debug@4.4.3)
-      nanoid: 3.3.11
-      rxjs: 7.8.2
-    transitivePeerDependencies:
-      - debug
 
   '@sanity/client@7.14.0(debug@4.4.3)':
     dependencies:
@@ -5775,7 +5760,7 @@ snapshots:
 
   '@sanity/mutate@0.15.0(debug@4.4.3)':
     dependencies:
-      '@sanity/client': 7.13.2(debug@4.4.3)
+      '@sanity/client': 7.14.0(debug@4.4.3)
       '@sanity/diff-match-patch': 3.2.0
       '@sanity/uuid': 3.0.2
       hotscript: 1.0.13
@@ -5788,7 +5773,7 @@ snapshots:
 
   '@sanity/types@5.0.1(@types/react@19.2.7)(debug@4.4.3)':
     dependencies:
-      '@sanity/client': 7.13.2(debug@4.4.3)
+      '@sanity/client': 7.14.0(debug@4.4.3)
       '@sanity/media-library-types': 1.0.2
       '@types/react': 19.2.7
     transitivePeerDependencies:
@@ -5806,7 +5791,7 @@ snapshots:
     dependencies:
       '@date-fns/tz': 1.4.1
       '@date-fns/utc': 2.1.1
-      '@sanity/client': 7.13.2(debug@4.4.3)
+      '@sanity/client': 7.14.0(debug@4.4.3)
       '@sanity/types': 5.0.1(@types/react@19.2.7)(debug@4.4.3)
       date-fns: 4.1.0
       rxjs: 7.8.2
