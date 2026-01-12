@@ -1,7 +1,7 @@
 import path from 'node:path'
 
 import {Args, Flags} from '@oclif/core'
-import {SanityCommand, subdebug} from '@sanity/cli-core'
+import {getProjectCliClient, SanityCommand, subdebug} from '@sanity/cli-core'
 import {chalk, confirm, spinner} from '@sanity/cli-core/ux'
 import {Table} from 'console-table-printer'
 
@@ -197,8 +197,8 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
       }
     }
 
-    const projectClient = await this.getProjectApiClient({
-      apiVersion: apiVersion,
+    const projectClient = await getProjectCliClient({
+      apiVersion,
       projectId: (project ?? projectId)!,
       requireUser: true,
     })
@@ -206,7 +206,7 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
 
     const apiConfig: APIConfig = {
       apiHost: projectConfig.apiHost,
-      apiVersion: apiVersion,
+      apiVersion,
       dataset: (dataset ?? datasetFromConfig)!,
       projectId: (project ?? projectId)!,
       token: projectConfig.token!,
@@ -280,6 +280,7 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
       ? `» ${prettyFormat({indentSize: 2, migration, subject: transaction})}`
       : ''
   }`
+        progressSpinner.stopAndPersist({symbol: chalk.green('✔')})
       }
     }
   }
