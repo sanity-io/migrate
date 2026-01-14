@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.2](https://github.com/sanity-io/migrate/compare/migrate-v5.2.1...migrate-v5.2.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* fixes issue where spinner was not showing when running migration ([1b83d3c](https://github.com/sanity-io/migrate/commit/1b83d3c9e6a23da440dfecd187d534e792d193dd))
+
 ## [5.2.1](https://github.com/sanity-io/migrate/compare/migrate-v5.2.0...migrate-v5.2.1) (2026-01-05)
 
 
