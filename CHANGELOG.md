@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.3](https://github.com/sanity-io/migrate/compare/migrate-v5.2.2...migrate-v5.2.3) (2026-01-27)
+
+
+### Bug Fixes
+
+* **deps:** update oclif-tooling ([#26](https://github.com/sanity-io/migrate/issues/26)) ([8b613d1](https://github.com/sanity-io/migrate/commit/8b613d11951d034bf264cbec752c893236f92bbf))
+* **deps:** update sanity-tooling ([#24](https://github.com/sanity-io/migrate/issues/24)) ([a014896](https://github.com/sanity-io/migrate/commit/a014896c02cf26eb806da821a2ddd2d774ca7665))
+
 ## [5.2.2](https://github.com/sanity-io/migrate/compare/migrate-v5.2.1...migrate-v5.2.2) (2026-01-14)
 
 
