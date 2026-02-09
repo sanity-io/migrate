@@ -21,7 +21,7 @@ const CHUNK_SIZE = 1024
  * @returns A function that can be called multiple times to create a readable stream on top of the buffer file.
  */
 export function bufferThroughFile(
-  source: ReadableStream<Uint8Array>,
+  source: globalThis.ReadableStream<Uint8Array>,
   filename: string,
   options?: {keepFile?: boolean; signal: AbortSignal},
 ) {
@@ -47,7 +47,7 @@ export function bufferThroughFile(
   let readerCount = 0
   let ready: Promise<void>
 
-  async function pump(reader: ReadableStreamDefaultReader<Uint8Array>) {
+  async function pump(reader: globalThis.ReadableStreamDefaultReader<Uint8Array>) {
     try {
       while (true) {
         const {done, value} = await reader.read()

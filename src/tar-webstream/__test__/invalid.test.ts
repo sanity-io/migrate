@@ -1,13 +1,8 @@
-import path from 'node:path'
-import {fileURLToPath} from 'node:url'
-
 import {expect, test} from 'vitest'
 
 import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream.js'
 import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
 import {untar} from '../untar.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function* extract(file: string) {
   const fileStream = readFileAsWebStream(file)
@@ -20,7 +15,8 @@ async function* extract(file: string) {
 
 test('untar an empty tar file', async () => {
   await expect(async () => {
-    for await (const [, body] of extract(`${__dirname}/fixtures/empty.tar`)) {
+    for await (const [, body] of extract(`${import.meta.dirname}/fixtures/empty.tar`)) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for await (const _chunk of body!) {
         // should throw before reaching here
       }
@@ -32,7 +28,8 @@ test('untar an empty tar file', async () => {
 
 test('untar an invalid tar file of > 512b', async () => {
   await expect(async () => {
-    for await (const [, body] of extract(`${__dirname}/fixtures/invalid.tar`)) {
+    for await (const [, body] of extract(`${import.meta.dirname}/fixtures/invalid.tar`)) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for await (const _chunk of body!) {
         // should throw before reaching here
       }
@@ -44,7 +41,8 @@ test('untar an invalid tar file of > 512b', async () => {
 
 test('untar a corrupted tar file', async () => {
   await expect(async () => {
-    for await (const [, body] of extract(`${__dirname}/fixtures/corrupted.tar`)) {
+    for await (const [, body] of extract(`${import.meta.dirname}/fixtures/corrupted.tar`)) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for await (const _chunk of body!) {
         // should throw before reaching here
       }

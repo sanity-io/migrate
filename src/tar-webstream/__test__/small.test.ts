@@ -1,6 +1,3 @@
-import path from 'node:path'
-import {fileURLToPath} from 'node:url'
-
 import {expect, test} from 'vitest'
 
 import {readFileAsWebStream} from '../../fs-webstream/readFileAsWebStream.js'
@@ -8,8 +5,6 @@ import {decodeText} from '../../it-utils/decodeText.js'
 import {toArray} from '../../it-utils/toArray.js'
 import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
 import {untar} from '../untar.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function* extract(file: string) {
   const fileStream = readFileAsWebStream(file)
@@ -20,7 +15,9 @@ async function* extract(file: string) {
 }
 
 test('untar a small file', async () => {
-  const values = Object.fromEntries(await toArray(extract(`${__dirname}/fixtures/small.tar`)))
+  const values = Object.fromEntries(
+    await toArray(extract(`${import.meta.dirname}/fixtures/small.tar`)),
+  )
 
   expect(values).toEqual({
     'a.txt': {

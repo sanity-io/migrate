@@ -1,8 +1,8 @@
 import {concatUint8Arrays} from '../uint8arrays/index.js'
 
-export function peekInto(readable: ReadableStream, options: {size: number}) {
+export function peekInto(readable: globalThis.ReadableStream, options: {size: number}) {
   const {size} = options
-  return new Promise<[head: Uint8Array, ReadableStream]>((resolve, reject) => {
+  return new Promise<[head: Uint8Array, globalThis.ReadableStream]>((resolve, reject) => {
     let totalBytesRead = 0
     let streamCompleted = false
     const chunks: Array<Uint8Array> = []

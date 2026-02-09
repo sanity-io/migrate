@@ -1,6 +1,4 @@
 import {webcrypto} from 'node:crypto'
-import path from 'node:path'
-import {fileURLToPath} from 'node:url'
 
 import {expect, test} from 'vitest'
 
@@ -10,8 +8,6 @@ import {concatUint8Arrays} from '../../uint8arrays/index.js'
 import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
 import {drain} from '../drain.js'
 import {untar} from '../untar.js'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function getCrypto() {
   // eslint-disable-next-line n/no-unsupported-features/node-builtins
@@ -35,7 +31,7 @@ function hex(data: Uint8Array) {
 const file = '7eeec7b86ddfefd7d7b66e137b2b9220a527528f-185x278.jpg'
 
 test('untar movies dataset export', async () => {
-  const fileStream = readFileAsWebStream(`${__dirname}/fixtures/movies.tar`)
+  const fileStream = readFileAsWebStream(`${import.meta.dirname}/fixtures/movies.tar`)
 
   for await (const [header, body] of streamToAsyncIterator(untar(fileStream))) {
     if (header.name.includes(file)) {

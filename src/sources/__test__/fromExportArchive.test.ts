@@ -1,15 +1,10 @@
-import path from 'node:path'
-import {fileURLToPath} from 'node:url'
-
 import {expect, test} from 'vitest'
 
 import {decodeText, parse, toArray} from '../../it-utils/index.js'
 import {fromExportArchive} from '../fromExportArchive.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
 test('untar movies dataset export, but not reading assets', async () => {
-  const docsFromExport = fromExportArchive(`${__dirname}/fixtures/example.tar.gz`)
+  const docsFromExport = fromExportArchive(`${import.meta.dirname}/fixtures/example.tar.gz`)
 
   const allDocs = await toArray(parse<{_id: string}>(decodeText(docsFromExport)))
 
