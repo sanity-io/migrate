@@ -5,7 +5,7 @@
 const objectToString = Object.prototype.toString
 const uint8ArrayStringified = '[object Uint8Array]'
 
-export function isUint8Array(value: unknown): value is Uint8Array {
+function isUint8Array(value: unknown): value is Uint8Array {
   if (!value) {
     return false
   }
@@ -17,7 +17,7 @@ export function isUint8Array(value: unknown): value is Uint8Array {
   return objectToString.call(value) === uint8ArrayStringified
 }
 
-export function assertUint8Array(value: unknown): asserts value is Uint8Array {
+function assertUint8Array(value: unknown): asserts value is Uint8Array {
   if (!isUint8Array(value)) {
     throw new TypeError(`Expected \`Uint8Array\`, got \`${typeof value}\``)
   }
