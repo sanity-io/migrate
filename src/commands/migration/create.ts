@@ -1,9 +1,10 @@
 import {access, mkdir, writeFile} from 'node:fs/promises'
 import path from 'node:path'
+import {styleText} from 'node:util'
 
 import {Args} from '@oclif/core'
 import {SanityCommand} from '@sanity/cli-core'
-import {chalk, confirm, input, select} from '@sanity/cli-core/ux'
+import {confirm, input, select} from '@sanity/cli-core/ux'
 import {deburr} from 'lodash-es'
 
 import {getMigrationRootDirectory} from '../../actions/migration/getMigrationRootDirectory.js'
@@ -75,27 +76,31 @@ export class CreateMigrationCommand extends SanityCommand<typeof CreateMigration
 
     if (dirCreated) {
       this.log()
-      this.log(`${chalk.green('✓')} Migration created!`)
+      this.log(`${styleText('green', '✓')} Migration created!`)
       this.log()
       this.log('Next steps:')
       this.log(
-        `Open ${chalk.bold(
+        `Open ${styleText(
+          'bold',
           definitionFile,
         )} in your code editor and write the code for your migration.`,
       )
       this.log(
-        `Dry run the migration with:\n\`${chalk.bold(
+        `Dry run the migration with:\n\`${styleText(
+          'bold',
           `sanity migration run ${sluggedName} --project=<projectId> --dataset <dataset> `,
         )}\``,
       )
       this.log(
-        `Run the migration against a dataset with:\n \`${chalk.bold(
+        `Run the migration against a dataset with:\n \`${styleText(
+          'bold',
           `sanity migration run ${sluggedName} --project=<projectId> --dataset <dataset> --no-dry-run`,
         )}\``,
       )
       this.log()
       this.log(
-        `👉 Learn more about schema and content migrations at ${chalk.bold(
+        `👉 Learn more about schema and content migrations at ${styleText(
+          'bold',
           'https://www.sanity.io/docs/schema-and-content-migrations',
         )}`,
       )
@@ -143,7 +148,7 @@ export class CreateMigrationCommand extends SanityCommand<typeof CreateMigration
   private async promptForOverwrite(destDir: string): Promise<boolean> {
     return confirm({
       default: false,
-      message: `Migration directory ${chalk.cyan(destDir)} already exists. Overwrite?`,
+      message: `Migration directory ${styleText('cyan', destDir)} already exists. Overwrite?`,
     })
   }
 

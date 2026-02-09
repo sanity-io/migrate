@@ -1,7 +1,7 @@
 import {isatty} from 'node:tty'
+import {styleText} from 'node:util'
 
 import {convertToTree, formatTree, maxKeyLength} from '@sanity/cli-core/tree'
-import {chalk} from '@sanity/cli-core/ux'
 import {type KeyedSegment} from '@sanity/types'
 
 import {Transaction} from '../../mutations/transaction.js'
@@ -32,7 +32,7 @@ export function prettyFormat({
         return [
           [
             badge('transaction', 'info'),
-            subjectEntry.id === undefined ? null : chalk.underline(subjectEntry.id),
+            subjectEntry.id === undefined ? null : styleText('underline', subjectEntry.id),
           ]
             .filter(Boolean)
             .join(' '),
@@ -58,12 +58,12 @@ function encodeItemRef(ref: KeyedSegment | number): ItemRef {
   return typeof ref === 'number' ? ref : ref._key
 }
 
-function badgeStyle(variant: Variant): typeof chalk {
-  const styles: Record<Variant, typeof chalk> = {
-    destructive: chalk.bgRed.black.bold,
-    incremental: chalk.bgGreen.black.bold,
-    info: chalk.bgWhite.black,
-    maybeDestructive: chalk.bgYellow.black.bold,
+function badgeStyle(variant: Variant, label: string) {
+  const styles: Record<Variant, string> = {
+    destructive: styleText(['bgRed', 'black', 'bold'], label),
+    incremental: styleText(['bgGreen', 'black', 'bold'], label),
+    info: styleText(['bgWhite', 'black'], label),
+    maybeDestructive: styleText(['bgYellow', 'black', 'bold'], label),
   }
 
   return styles[variant]
@@ -74,7 +74,7 @@ function badge(label: string, variant: Variant): string {
     return `[${label}]`
   }
 
-  return badgeStyle(variant)(` ${label} `)
+  return badgeStyle(variant, ` ${label} `)
 }
 
 const mutationImpact: Record<Mutation['type'], Impact> = {
@@ -115,7 +115,7 @@ function mutationHeader(mutation: Mutation, migration: Migration): string {
       : null
 
   // TODO: Should we list documentType when a mutation can be yielded for any document type?
-  return [mutationType, documentType, chalk.underline(documentId(mutation))]
+  return [mutationType, documentType, styleText('underline', documentId(mutation) ?? '')]
     .filter(Boolean)
     .join(' ')
 }
@@ -126,7 +126,7 @@ function prettyFormatMutation({
   subject,
 }: FormatterOptions<Mutation>): string {
   const lock =
-    'options' in subject ? chalk.cyan(`(if revision==${subject.options?.ifRevision})`) : ''
+    'options' in subject ? styleText('cyan', `(if revision==${subject.options?.ifRevision})`) : ''
   const header = [mutationHeader(subject, migration), lock].join(' ')
   const padding = ' '.repeat(indentSize)
 
@@ -159,34 +159,34 @@ function prettyFormatMutation({
 
 function formatPatchMutation(patch: NodePatch): string {
   const {op} = patch
-  const formattedType = chalk.bold(op.type)
+  const formattedType = styleText('bold', op.type)
   if (op.type === 'unset') {
-    return `${chalk.red(formattedType)}()`
+    return `${styleText('red', formattedType)}()`
   }
   if (op.type === 'diffMatchPatch') {
-    return `${chalk.yellow(formattedType)}(${op.value})`
+    return `${styleText('yellow', formattedType)}(${op.value})`
   }
   if (op.type === 'inc' || op.type === 'dec') {
-    return `${chalk.yellow(formattedType)}(${op.amount})`
+    return `${styleText('yellow', formattedType)}(${op.amount})`
   }
   if (op.type === 'set') {
-    return `${chalk.yellow(formattedType)}(${JSON.stringify(op.value)})`
+    return `${styleText('yellow', formattedType)}(${JSON.stringify(op.value)})`
   }
   if (op.type === 'setIfMissing') {
-    return `${chalk.green(formattedType)}(${JSON.stringify(op.value)})`
+    return `${styleText('green', formattedType)}(${JSON.stringify(op.value)})`
   }
   if (op.type === 'insert') {
-    return `${chalk.green(formattedType)}(${op.position}, ${encodeItemRef(
+    return `${styleText('green', formattedType)}(${op.position}, ${encodeItemRef(
       op.referenceItem,
     )}, ${JSON.stringify(op.items)})`
   }
   if (op.type === 'replace') {
-    return `${chalk.yellow(formattedType)}(${encodeItemRef(op.referenceItem)}, ${JSON.stringify(
+    return `${styleText('yellow', formattedType)}(${encodeItemRef(op.referenceItem)}, ${JSON.stringify(
       op.items,
     )})`
   }
   if (op.type === 'truncate') {
-    return `${chalk.red(formattedType)}(${op.startIndex}, ${op.endIndex})`
+    return `${styleText('red', formattedType)}(${op.startIndex}, ${op.endIndex})`
   }
 
   throw new Error(`Invalid operation type: ${(op as {type: string}).type}`)

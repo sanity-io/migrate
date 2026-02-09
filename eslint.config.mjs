@@ -18,6 +18,7 @@ export default defineConfig([
             'Response',
             'DecompressionStream',
             'ReadableStream',
+            'util.styleText',
           ],
         },
       ],
