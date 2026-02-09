@@ -1,6 +1,5 @@
 import {stat} from 'node:fs/promises'
 import path from 'node:path'
-import {fileURLToPath} from 'node:url'
 
 import {describe, expect, test} from 'vitest'
 
@@ -11,12 +10,10 @@ import {asyncIterableToStream} from '../../utils/asyncIterableToStream.js'
 import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
 import {bufferThroughFile} from '../bufferThroughFile.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 let id = 0
-const getTestBufferFileName = () => path.join(__dirname, '.tmp', `buffer-${id++}.ndjson`)
+const getTestBufferFileName = () => path.join(import.meta.dirname, '.tmp', `buffer-${id++}.ndjson`)
 
 describe('using primary stream', () => {
   test('stops buffering when the consumer is done', async () => {

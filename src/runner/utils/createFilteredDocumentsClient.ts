@@ -6,7 +6,7 @@ import {type MigrationContext} from '../../types.js'
 import {streamToAsyncIterator} from '../../utils/streamToAsyncIterator.js'
 
 export function createFilteredDocumentsClient(
-  getFilteredDocumentsReadableStream: () => ReadableStream<Uint8Array>,
+  getFilteredDocumentsReadableStream: () => globalThis.ReadableStream<Uint8Array>,
 ): MigrationContext['filtered'] {
   function getAllDocumentsFromBuffer<T extends SanityDocument>() {
     return parse<T>(decodeText(streamToAsyncIterator(getFilteredDocumentsReadableStream())), {

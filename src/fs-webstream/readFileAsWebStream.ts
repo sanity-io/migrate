@@ -6,7 +6,7 @@ const debug = baseDebug.extend('readFileAsWebStream')
 
 const CHUNK_SIZE = 1024 * 16
 
-export function readFileAsWebStream(filename: string): ReadableStream<Uint8Array> {
+export function readFileAsWebStream(filename: string): globalThis.ReadableStream<Uint8Array> {
   let fileHandle: FileHandle
   let position = 0
 

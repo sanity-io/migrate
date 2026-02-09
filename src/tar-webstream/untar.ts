@@ -1,5 +1,3 @@
-import {ReadableStream} from 'node:stream/web'
-
 import {BufferList} from './BufferList.js'
 import * as headers from './headers.js'
 import {type TarHeader} from './headers.js'
@@ -70,7 +68,7 @@ export function untar(
 }
 
 function entryStream(
-  reader: ReadableStreamDefaultReader<Uint8Array>,
+  reader: globalThis.ReadableStreamDefaultReader<Uint8Array>,
   expectedBytes: number,
   buffer: BufferList,
   next: () => void,
