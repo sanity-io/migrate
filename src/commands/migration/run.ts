@@ -1,8 +1,9 @@
 import path from 'node:path'
+import {styleText} from 'node:util'
 
 import {Args, Flags} from '@oclif/core'
 import {getProjectCliClient, SanityCommand, subdebug} from '@sanity/cli-core'
-import {chalk, confirm, spinner} from '@sanity/cli-core/ux'
+import {confirm, spinner} from '@sanity/cli-core/ux'
 import {Table} from 'console-table-printer'
 
 import {getMigrationRootDirectory} from '../../actions/migration/getMigrationRootDirectory.js'
@@ -125,7 +126,7 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
     }
 
     if (!id) {
-      this.warn(chalk.red('Error: Migration ID must be provided'))
+      this.warn(styleText('red', 'Error: Migration ID must be provided'))
 
       const migrations = await resolveMigrations(workDir)
       const table = new Table({
@@ -151,7 +152,7 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
     if (resolvedScripts.length > 1) {
       // todo: consider prompt user about which one to run? note: it's likely a mistake if multiple files resolve to the same name
       this.error(
-        `Found multiple migrations for "${id}" in ${chalk.cyan(migrationsDirectoryPath)}: \n - ${candidates
+        `Found multiple migrations for "${id}" in ${styleText('cyan', migrationsDirectoryPath)}: \n - ${candidates
           .map((candidate) => path.relative(migrationsDirectoryPath, candidate.absolutePath))
           .join('\n - ')}`,
         {exit: 1},
@@ -161,7 +162,7 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
     const script = resolvedScripts[0]
     if (!script) {
       this.error(
-        `No migration found for "${id}" in ${chalk.cyan(chalk.cyan(migrationsDirectoryPath))}. Make sure that the migration file exists and exports a valid migration as its default export.\n
+        `No migration found for "${id}" in ${styleText('cyan', migrationsDirectoryPath)}. Make sure that the migration file exists and exports a valid migration as its default export.\n
  Tried the following files:\n - ${candidates
    .map((candidate) => path.relative(migrationsDirectoryPath, candidate.absolutePath))
    .join('\n - ')}`,
@@ -216,9 +217,11 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
       return
     }
 
-    this.log(`\n${chalk.yellow(chalk.bold('Note: During migrations, your webhooks stay active.'))}`)
     this.log(
-      `To adjust them, launch the management interface with ${chalk.cyan('sanity manage')}, navigate to the API settings, and toggle the webhooks before and after the migration as needed.\n`,
+      `\n${styleText(['yellow', 'bold'], 'Note: During migrations, your webhooks stay active.')}`,
+    )
+    this.log(
+      `To adjust them, launch the management interface with ${styleText('cyan', 'sanity manage')}, navigate to the API settings, and toggle the webhooks before and after the migration as needed.\n`,
     )
 
     if (flags.confirm) {
@@ -253,34 +256,34 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
       if (progress.done) {
         progressSpinner.text = `Migration "${id}" completed.
 
-  Project id:  ${chalk.bold(apiConfig.projectId)}
-  Dataset:     ${chalk.bold(apiConfig.dataset)}
+  Project id:  ${styleText('bold', apiConfig.projectId)}
+  Dataset:     ${styleText('bold', apiConfig.dataset)}
 
   ${progress.documents} documents processed.
   ${progress.mutations} mutations generated.
-  ${chalk.green(progress.completedTransactions.length)} transactions committed.`
-        progressSpinner.stopAndPersist({symbol: chalk.green('✔')})
+  ${styleText('green', String(progress.completedTransactions.length))} transactions committed.`
+        progressSpinner.stopAndPersist({symbol: styleText('green', '✔')})
         return
       }
 
       for (const transaction of [null, ...progress.currentTransactions]) {
         progressSpinner.text = `Running migration "${id}" ${dry ? 'in dry mode...' : '...'}
 
-  Project id:     ${chalk.bold(apiConfig.projectId)}
-  Dataset:        ${chalk.bold(apiConfig.dataset)}
-  Document type:  ${chalk.bold(migration.documentTypes?.join(','))}
+  Project id:     ${styleText('bold', apiConfig.projectId)}
+  Dataset:        ${styleText('bold', apiConfig.dataset)}
+  Document type:  ${styleText('bold', migration.documentTypes?.join(',') ?? '')}
 
   ${progress.documents} documents processed…
   ${progress.mutations} mutations generated…
-  ${chalk.blue(progress.pending)} requests pending…
-  ${chalk.green(progress.completedTransactions.length)} transactions committed.
+  ${styleText('blue', String(progress.pending))} requests pending…
+  ${styleText('green', String(progress.completedTransactions.length))} transactions committed.
 
   ${
     transaction && !progress.done
       ? `» ${prettyFormat({indentSize: 2, migration, subject: transaction})}`
       : ''
   }`
-        progressSpinner.stopAndPersist({symbol: chalk.green('✔')})
+        progressSpinner.stopAndPersist({symbol: styleText('green', '✔')})
       }
     }
   }
@@ -294,12 +297,12 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
     this.log(`Running migration "${id}" in dry mode`)
 
     if (fromExport) {
-      this.log(`Using export ${chalk.cyan(fromExport)}`)
+      this.log(`Using export ${styleText('cyan', fromExport)}`)
     }
 
     this.log()
-    this.log(`Project id:  ${chalk.bold(apiConfig.projectId)}`)
-    this.log(`Dataset:     ${chalk.bold(apiConfig.dataset)}`)
+    this.log(`Project id:  ${styleText('bold', apiConfig.projectId)}`)
+    this.log(`Dataset:     ${styleText('bold', apiConfig.dataset)}`)
 
     for await (const mutation of dryRun({api: apiConfig, exportPath: fromExport}, migration)) {
       if (!mutation) continue
@@ -315,9 +318,10 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
 
   private async promptConfirmMigrate(apiConfig: APIConfig) {
     const response = await confirm({
-      message: `This migration will run on the ${chalk.yellow(
-        chalk.bold(apiConfig.dataset),
-      )} dataset in ${chalk.yellow(chalk.bold(apiConfig.projectId))} project. Are you sure?`,
+      message: `This migration will run on the ${styleText(
+        ['yellow', 'bold'],
+        apiConfig.dataset,
+      )} dataset in ${styleText(['yellow', 'bold'], apiConfig.projectId)} project. Are you sure?`,
     })
 
     if (!response) {

@@ -1,5 +1,6 @@
+import {styleText} from 'node:util'
+
 import {SanityCommand, subdebug} from '@sanity/cli-core'
-import {chalk} from '@sanity/cli-core/ux'
 import {Table} from 'console-table-printer'
 
 import {resolveMigrations} from '../../actions/migration/resolveMigrations.js'
@@ -25,7 +26,7 @@ export class ListMigrationCommand extends SanityCommand<typeof ListMigrationComm
       if (migrations.length === 0) {
         this.log('No migrations found in migrations folder of the project')
         this.log(
-          `\nRun ${chalk.green('`sanity migration create <NAME>`')} to create a new migration`,
+          `\nRun ${styleText('green', '`sanity migration create <NAME>`')} to create a new migration`,
         )
         return
       }
@@ -48,7 +49,7 @@ export class ListMigrationCommand extends SanityCommand<typeof ListMigrationComm
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         this.log('No migrations folder found in the project')
         this.log(
-          `\nRun ${chalk.green('`sanity migration create <NAME>`')} to create a new migration`,
+          `\nRun ${styleText('green', '`sanity migration create <NAME>`')} to create a new migration`,
         )
         return
       }
