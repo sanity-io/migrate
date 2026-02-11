@@ -3,9 +3,6 @@ import {type Path, type PathSegment} from '@sanity/types'
 import {type JsonArray, type JsonObject, type JsonValue} from '../../json.js'
 import {getValueType} from './getValueType.js'
 
-type SkipMarker = {_: 'SKIP_MARKER'}
-export const SKIP_MARKER: SkipMarker = {_: 'SKIP_MARKER'}
-
 function callMap<T>(mapFn: MapFn<T>, value: JsonValue, path: Path): T[] {
   const res = mapFn(value, path)
   return Array.isArray(res) ? res : [res]

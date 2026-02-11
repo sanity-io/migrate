@@ -10,11 +10,17 @@
       "tagName": "@todo",
       "syntaxKind": "block",
       "allowMultiple": true
+    },
+    {
+      "tagName": "@alias",
+      "syntaxKind": "block",
+      "allowMultiple": true
     }
   ],
   "supportForTags": {
     "@hidden": true,
     "@beta": true,
+    "@alias": true,
     "@internal": true,
     "@public": true,
     "@experimental": true,

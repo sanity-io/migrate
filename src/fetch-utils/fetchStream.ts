@@ -18,7 +18,7 @@ interface ErrorResponse {
   message?: string
 }
 
-export class HTTPError extends Error {
+class HTTPError extends Error {
   statusCode: number
 
   constructor(statusCode: number, message: string) {

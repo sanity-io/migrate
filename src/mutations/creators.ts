@@ -101,5 +101,6 @@ export function delete_(id: string): DeleteMutation {
 /**
  * Alias for delete
  * @public
+ * @alias
  */
 export const del = delete_
