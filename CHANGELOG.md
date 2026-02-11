@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.4](https://github.com/sanity-io/migrate/compare/migrate-v5.2.3...migrate-v5.2.4) (2026-02-11)
+
+
+### Bug Fixes
+
+* **deps:** update cli-core and cli-test package ([#30](https://github.com/sanity-io/migrate/issues/30)) ([db7a72b](https://github.com/sanity-io/migrate/commit/db7a72b69661aad783a8e4449962951c2392ee47))
+* **deps:** update dependency lodash-es to ^4.17.23 ([#27](https://github.com/sanity-io/migrate/issues/27)) ([acbb1af](https://github.com/sanity-io/migrate/commit/acbb1afc3b8e45864886441cf95e736022a8973a))
+* **deps:** update dependency oclif to ^4.22.77 ([#34](https://github.com/sanity-io/migrate/issues/34)) ([ff1748b](https://github.com/sanity-io/migrate/commit/ff1748babac721a5f0f60a7331635f23adaeb760))
+
 ## [5.2.3](https://github.com/sanity-io/migrate/compare/migrate-v5.2.2...migrate-v5.2.3) (2026-01-27)
 
 
