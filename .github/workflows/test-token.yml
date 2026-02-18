@@ -1,0 +1,37 @@
+name: Test GitHub App Token
+
+on:
+  pull_request:
+
+jobs:
+  test-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.ECOSPARK_APP_ID }}
+          private-key: ${{ secrets.ECOSPARK_APP_PRIVATE_KEY }}
+
+      - name: Verify Token Output Exists
+        run: |
+          if [ -z "${{ steps.generate_token.outputs.token }}" ]; then
+            echo "❌ Token output is empty - generation failed"
+            exit 1
+          else
+            echo "✅ Token output is present and masked by GitHub"
+          fi
+
+      - name: Test Token Against GitHub API
+        run: |
+          echo "--- Checking token identity ---"
+          # Only print app name, never IDs or installation details
+          gh api /app --jq '"App Name: " + .name'
+
+          echo ""
+          echo "--- Checking token is valid ---"
+          # Only confirm repos are accessible, never list names or counts
+          gh api /installation/repositories --jq 'if .total_count > 0 then "✅ Token is valid and has repository access" else "⚠️ Token is valid but no repositories are accessible" end'
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
