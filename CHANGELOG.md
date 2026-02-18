@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.5](https://github.com/sanity-io/migrate/compare/migrate-v5.2.4...migrate-v5.2.5) (2026-02-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency oclif to ^4.22.79 ([#43](https://github.com/sanity-io/migrate/issues/43)) ([5478a3a](https://github.com/sanity-io/migrate/commit/5478a3a03208589af71d2d0d3aec42012e6950ee))
+* **deps:** update sanity-tooling ([#36](https://github.com/sanity-io/migrate/issues/36)) ([5b7ae61](https://github.com/sanity-io/migrate/commit/5b7ae6141e2fbec92c5fec60d5b34c42ab811334))
+* move @sanity/eslint-config-cli to dev dependencies ([#37](https://github.com/sanity-io/migrate/issues/37)) ([a5e9db0](https://github.com/sanity-io/migrate/commit/a5e9db06b8777e6aed5cb5a608d51f0359434de9))
+
 ## [5.2.4](https://github.com/sanity-io/migrate/compare/migrate-v5.2.3...migrate-v5.2.4) (2026-02-11)
 
 
