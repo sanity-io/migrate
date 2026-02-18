@@ -20,9 +20,6 @@ importers:
       '@sanity/client':
         specifier: ^7.15.0
         version: 7.15.0(debug@4.4.3)
-      '@sanity/eslint-config-cli':
-        specifier: ^0.0.0-alpha.2
-        version: 0.0.0-alpha.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       '@sanity/mutate':
         specifier: ^0.16.1
         version: 0.16.1(debug@4.4.3)
@@ -72,6 +69,9 @@ importers:
       '@sanity/cli-test':
         specifier: ^0.0.2-alpha.11
         version: 0.0.2-alpha.11(@oclif/core@4.8.0)(@sanity/cli-core@0.1.0-alpha.12(@sanity/telemetry@0.8.1(react@19.2.4))(@types/node@25.2.3)(@types/react@19.2.7)(jiti@2.6.1))(@sanity/client@7.15.0(debug@4.4.3))(vitest@4.0.16(@types/node@25.2.3)(jiti@2.6.1)(jsdom@27.4.0)(tsx@4.21.0))
+      '@sanity/eslint-config-cli':
+        specifier: ^0.0.0-alpha.2
+        version: 0.0.0-alpha.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/parser@8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       '@swc/cli':
         specifier: ^0.7.9
         version: 0.7.9(@swc/core@1.15.11)(chokidar@5.0.0)
