@@ -6,7 +6,7 @@ export default defineConfig({
       exclude: ['src/**/*.d.ts'],
       include: ['src/**/*.ts'],
     },
-    disableConsoleIntercept: true, // helps @oclif/test helpers
+    disableConsoleIntercept: true,
     environment: 'node',
     include: ['**/*.test.ts'],
   },

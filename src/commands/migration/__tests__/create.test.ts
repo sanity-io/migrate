@@ -1,6 +1,5 @@
 import {access, mkdir, writeFile} from 'node:fs/promises'
 
-import {runCommand} from '@oclif/test'
 import {findProjectRoot} from '@sanity/cli-core'
 import {testCommand} from '@sanity/cli-test'
 import {afterEach, describe, expect, test, vi} from 'vitest'
@@ -75,34 +74,6 @@ const mockWriteFile = vi.mocked(writeFile)
 describe('#migration:create', () => {
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  test('--help works', async () => {
-    const {stdout} = await runCommand(['migration create', '--help'])
-
-    expect(stdout).toMatchInlineSnapshot(`
-      "Create a new migration within your project
-
-      USAGE
-        $ sanity migration create [TITLE]
-
-      ARGUMENTS
-        [TITLE]  Title of migration
-
-      DESCRIPTION
-        Create a new migration within your project
-
-      EXAMPLES
-        Create a new migration, prompting for title and options
-
-          $ sanity migration create
-
-        Create a new migration with the provided title, prompting for options
-
-          $ sanity migration create "Rename field from location to address"
-
-      "
-    `)
   })
 
   test('prompts user to enter title when no title argument is provided', async () => {

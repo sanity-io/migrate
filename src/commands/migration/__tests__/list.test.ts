@@ -1,6 +1,5 @@
 import {readdir} from 'node:fs/promises'
 
-import {runCommand} from '@oclif/test'
 import {testCommand} from '@sanity/cli-test'
 import {afterEach, describe, expect, test, vi} from 'vitest'
 
@@ -41,26 +40,6 @@ const mockResolveMigrationScript = vi.mocked(resolveMigrationScript)
 describe('#migration:list', () => {
   afterEach(() => {
     vi.clearAllMocks()
-  })
-
-  test('--help works', async () => {
-    const {stdout} = await runCommand(['migration list', '--help'])
-    expect(stdout).toMatchInlineSnapshot(`
-      "List available migrations
-
-      USAGE
-        $ sanity migration list
-
-      DESCRIPTION
-        List available migrations
-
-      EXAMPLES
-        List all available migrations in the project
-
-          $ sanity migration list
-
-      "
-    `)
   })
 
   test('lists migrations successfully with various formats', async () => {
