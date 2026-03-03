@@ -92,7 +92,6 @@
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
     "@microsoft/api-extractor": "^7.56.3",
-    "@oclif/test": "^4.1.16",
     "@sanity/cli-test": "^0.0.2-alpha.11",
     "@sanity/eslint-config-cli": "^0.0.0-alpha.2",
     "@swc/cli": "^0.7.9",
