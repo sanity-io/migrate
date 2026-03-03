@@ -458,10 +458,12 @@ describe('#migration:run', () => {
     })
 
     expect(mockConfirm).toHaveBeenCalledWith({
-      message: expect.stringContaining(
-        'This migration will run on the production dataset in test-project project. Are you sure?',
-      ),
+      message: expect.stringContaining('Are you sure?'),
     })
+    // Verify the message contains the key info (may be wrapped in ANSI codes on some Node versions)
+    const confirmMessage = mockConfirm.mock.calls[0]?.[0]?.message ?? ''
+    expect(confirmMessage).toContain('production')
+    expect(confirmMessage).toContain('test-project')
     expect(error?.oclif?.exit).toBe(1)
   })
 

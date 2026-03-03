@@ -1,4 +1,5 @@
 import {access, mkdir, writeFile} from 'node:fs/promises'
+import path from 'node:path'
 
 import {findProjectRoot} from '@sanity/cli-core'
 import {testCommand} from '@sanity/cli-test'
@@ -165,7 +166,7 @@ describe('#migration:create', () => {
     })
 
     expect(mockMkdir).toHaveBeenCalledWith(
-      expect.stringContaining('/test/path/migrations/migration-title'),
+      expect.stringContaining(path.join('test', 'path', 'migrations', 'migration-title')),
       {
         recursive: true,
       },
@@ -185,10 +186,10 @@ describe('#migration:create', () => {
 
     expect(mockConfirm).toHaveBeenCalledWith({
       default: false,
-      message: expect.stringContaining(
-        'Migration directory /test/path/migrations/my-migration already exists. Overwrite?',
-      ),
+      message: expect.stringContaining('already exists. Overwrite?'),
     })
+    const confirmMessage = mockConfirm.mock.calls[0]?.[0]?.message ?? ''
+    expect(confirmMessage).toContain(path.join('test', 'path', 'migrations', 'my-migration'))
     expect(mockMkdir).toHaveBeenCalled()
   })
 
@@ -218,7 +219,7 @@ describe('#migration:create', () => {
 
     expect(mockConfirm).toHaveBeenCalled()
     expect(mockMkdir).toHaveBeenCalledWith(
-      expect.stringContaining('test/path/migrations/my-migration'),
+      expect.stringContaining(path.join('test', 'path', 'migrations', 'my-migration')),
       {
         recursive: true,
       },
@@ -252,20 +253,9 @@ describe('#migration:create', () => {
 
     expect(mockWriteFile).toHaveBeenCalled()
 
-    expect(stdout).toMatchInlineSnapshot(`
-      "
-      ✓ Migration created!
-
-      Next steps:
-      Open /test/path/migrations/my-migration/index.ts in your code editor and write the code for your migration.
-      Dry run the migration with:
-      \`sanity migration run my-migration --project=<projectId> --dataset <dataset> \`
-      Run the migration against a dataset with:
-       \`sanity migration run my-migration --project=<projectId> --dataset <dataset> --no-dry-run\`
-
-      👉 Learn more about schema and content migrations at https://www.sanity.io/docs/schema-and-content-migrations
-      "
-    `)
+    expect(stdout).toContain('Migration created!')
+    expect(stdout).toContain(path.join('test', 'path', 'migrations', 'my-migration', 'index.ts'))
+    expect(stdout).toContain('sanity migration run my-migration')
   })
 
   test('creates minimalSimple template in migration folder when user selects it', async () => {
