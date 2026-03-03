@@ -9,14 +9,8 @@ importers:
   .:
     dependencies:
       '@oclif/core':
-        specifier: ^4.8.3
+        specifier: ^4.8.1
         version: 4.8.3
-      '@oclif/plugin-help':
-        specifier: ^6.2.37
-        version: 6.2.37
-      '@sanity/cli-core':
-        specifier: ^0.1.0-alpha.19
-        version: 0.1.0-alpha.19(@sanity/telemetry@0.8.1(react@19.2.4))(@types/node@25.2.3)(@types/react@19.2.7)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)
       '@sanity/client':
         specifier: ^7.16.0
         version: 7.16.0(debug@4.4.3)
@@ -54,6 +48,9 @@ importers:
       '@eslint/compat':
         specifier: ^2.0.0
         version: 2.0.0(eslint@9.39.2(jiti@2.6.1))
+      '@sanity/cli-core':
+        specifier: ^0.1.0-alpha.19
+        version: 0.1.0-alpha.19(@sanity/telemetry@0.8.1(react@19.2.4))(@types/node@25.2.3)(@types/react@19.2.7)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)
       '@sanity/cli-test':
         specifier: ^0.1.0-alpha.17
         version: 0.1.0-alpha.17(@oclif/core@4.8.3)(@sanity/cli-core@0.1.0-alpha.19(@sanity/telemetry@0.8.1(react@19.2.4))(@types/node@25.2.3)(@types/react@19.2.7)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0))(@sanity/client@7.16.0(debug@4.4.3))(vitest@4.0.16(@types/node@25.2.3)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.21.0))
