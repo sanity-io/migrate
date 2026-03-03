@@ -31,7 +31,7 @@
     "./package.json": "./package.json"
   },
   "main": "./dist/_exports/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/_exports/index.d.ts",
   "bin": {
     "sanity-migrate": "./bin/run.js"
   },
@@ -48,8 +48,7 @@
   "scripts": {
     "build": "swc --delete-dir-on-start src -d dist --strip-leading-paths && pnpm run build:types",
     "postbuild": "oclif manifest",
-    "build:api": "api-extractor run --local --verbose",
-    "build:types": "tsc --project tsconfig.build.json && pnpm run build:api",
+    "build:types": "pkg-utils build --emitDeclarationOnly",
     "clean": "rimraf dist node_modules",
     "coverage": "vitest run --coverage",
     "depcheck": "knip",
@@ -91,9 +90,9 @@
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
-    "@microsoft/api-extractor": "^7.56.3",
     "@sanity/cli-test": "^0.0.2-alpha.11",
     "@sanity/eslint-config-cli": "^0.0.0-alpha.2",
+    "@sanity/pkg-utils": "^10.4.5",
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.7",
     "@types/debug": "^4.1.12",
