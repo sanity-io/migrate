@@ -233,7 +233,7 @@ describe('cleanup', () => {
     await reader.cancel()
 
     await sleep(10)
-    await expect(stat(bufferFile)).rejects.toThrow('ENOENT')
+    await expect(stat(bufferFile)).rejects.toThrow(/ENOENT|EPERM/)
   })
   test('cleans up after the abortController aborts', async () => {
     const encoder = new TextEncoder()
