@@ -163,9 +163,7 @@ describe('#migration:run', () => {
       },
     })
 
-    expect(error?.message).toContain(
-      'sanity.cli.js does not contain a project identifier ("api.projectId") and no --project option was provided.',
-    )
+    expect(error?.message).toContain('Unable to determine project ID')
     expect(error?.oclif?.exit).toBe(1)
   })
 
