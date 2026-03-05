@@ -1,7 +1,7 @@
 import {isatty} from 'node:tty'
 import {styleText} from 'node:util'
 
-import {convertToTree, formatTree, maxKeyLength} from '@sanity/cli-core/tree'
+import {convertToTree, formatTree, maxKeyLength} from '../tree.js'
 import {type KeyedSegment} from '@sanity/types'
 
 import {Transaction} from '../../mutations/transaction.js'
