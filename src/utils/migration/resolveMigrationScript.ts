@@ -1,6 +1,8 @@
 import path from 'node:path'
 
-import {fileExists, importModule, subdebug} from '@sanity/cli-core'
+import {importModule, subdebug} from '@sanity/cli-core'
+
+import {fileExists} from '../fileExists.js'
 import isPlainObject from 'lodash-es/isPlainObject.js'
 
 import {Migration} from '../../types.js'
