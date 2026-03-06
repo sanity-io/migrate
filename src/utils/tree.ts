@@ -31,7 +31,7 @@ interface BaseNode {
   path: Path
 }
 
-export interface Tree<Node extends BaseNode> {
+interface Tree<Node extends BaseNode> {
   children?: Record<string, Tree<Node>>
   nodes?: Node[]
 }
