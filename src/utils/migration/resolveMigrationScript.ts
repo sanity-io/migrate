@@ -1,9 +1,10 @@
 import path from 'node:path'
 
-import {fileExists, importModule, subdebug} from '@sanity/cli-core'
+import {importModule, subdebug} from '@sanity/cli-core'
 import isPlainObject from 'lodash-es/isPlainObject.js'
 
 import {Migration} from '../../types.js'
+import {fileExists} from '../fileExists.js'
 import {MIGRATION_SCRIPT_EXTENSIONS, MIGRATIONS_DIRECTORY} from './constants.js'
 
 interface ResolvedMigrationScript {

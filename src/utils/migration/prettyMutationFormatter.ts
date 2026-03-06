@@ -1,12 +1,12 @@
 import {isatty} from 'node:tty'
 import {styleText} from 'node:util'
 
-import {convertToTree, formatTree, maxKeyLength} from '@sanity/cli-core/tree'
 import {type KeyedSegment} from '@sanity/types'
 
 import {Transaction} from '../../mutations/transaction.js'
 import {Mutation, NodePatch} from '../../mutations/types.js'
 import {Migration} from '../../types.js'
+import {convertToTree, formatTree, maxKeyLength} from '../tree.js'
 
 type ItemRef = number | string
 type Impact = 'destructive' | 'incremental' | 'maybeDestructive'
