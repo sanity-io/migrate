@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.2.6](https://github.com/sanity-io/migrate/compare/migrate-v5.2.5...migrate-v5.2.6) (2026-03-06)
+
+
+### Bug Fixes
+
+* **deps:** update cli tooling and use importModule ([#51](https://github.com/sanity-io/migrate/issues/51)) ([e8ed5bc](https://github.com/sanity-io/migrate/commit/e8ed5bcc8c10f1e87fd402a95f655c9e9c0a43be))
+* **deps:** update dependency get-tsconfig to ^4.13.6 ([#45](https://github.com/sanity-io/migrate/issues/45)) ([a8787e4](https://github.com/sanity-io/migrate/commit/a8787e4a60213b87eb961b44668ca275cac4b974))
+* **deps:** update sanity-tooling ([#46](https://github.com/sanity-io/migrate/issues/46)) ([cfd4063](https://github.com/sanity-io/migrate/commit/cfd4063975b1fef95ef709c83ffaf6c25e64d64b))
+
 ## [5.2.5](https://github.com/sanity-io/migrate/compare/migrate-v5.2.4...migrate-v5.2.5) (2026-02-18)
 
 
