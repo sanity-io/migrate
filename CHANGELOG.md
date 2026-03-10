@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.0](https://github.com/sanity-io/migrate/compare/migrate-v5.2.5...migrate-v6.0.0) (2026-03-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes the standalone migrate CLI command. Use `sanity migration` instead
+
+### Features
+
+* Removes the standalone migrate CLI command. Use `sanity migration` instead ([05701e3](https://github.com/sanity-io/migrate/commit/05701e321ab142cd19432f64f851c152e4bdc9cc))
+
+
+### Bug Fixes
+
+* **deps:** update cli tooling and use importModule ([#51](https://github.com/sanity-io/migrate/issues/51)) ([e8ed5bc](https://github.com/sanity-io/migrate/commit/e8ed5bcc8c10f1e87fd402a95f655c9e9c0a43be))
+* **deps:** update dependency get-tsconfig to ^4.13.6 ([#45](https://github.com/sanity-io/migrate/issues/45)) ([a8787e4](https://github.com/sanity-io/migrate/commit/a8787e4a60213b87eb961b44668ca275cac4b974))
+* **deps:** update oclif-tooling ([#55](https://github.com/sanity-io/migrate/issues/55)) ([ea05c6b](https://github.com/sanity-io/migrate/commit/ea05c6b300062e71a9fb0d3713f32e93ecb01f13))
+* **deps:** update sanity-tooling ([#46](https://github.com/sanity-io/migrate/issues/46)) ([cfd4063](https://github.com/sanity-io/migrate/commit/cfd4063975b1fef95ef709c83ffaf6c25e64d64b))
+* **deps:** update sanity-tooling ([#56](https://github.com/sanity-io/migrate/issues/56)) ([7b8fc05](https://github.com/sanity-io/migrate/commit/7b8fc05561142d032b140131f12e8e8ed0bd751c))
+
+
+### Documentation
+
+* add CONTRIBUTING.md ([#54](https://github.com/sanity-io/migrate/issues/54)) ([5c50f32](https://github.com/sanity-io/migrate/commit/5c50f32d8bdafcbc5dabcac3ab29172c3a6a02a6))
+
 ## [5.2.5](https://github.com/sanity-io/migrate/compare/migrate-v5.2.4...migrate-v5.2.5) (2026-02-18)
 
 
