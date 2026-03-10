@@ -32,11 +32,7 @@
   },
   "main": "./dist/_exports/index.js",
   "types": "./dist/_exports/index.d.ts",
-  "bin": {
-    "sanity-migrate": "./bin/run.js"
-  },
   "files": [
-    "bin",
     "dist",
     "oclif.manifest.json",
     "src",
@@ -65,19 +61,13 @@
     "bin": "sanity",
     "commands": "./dist/commands",
     "dirname": "sanity",
-    "plugins": [
-      "@oclif/plugin-help"
-    ],
     "topicSeparator": " "
   },
   "dependencies": {
-    "@oclif/core": "^4.8.3",
-    "@oclif/plugin-help": "^6.2.37",
-    "@sanity/cli-core": "^0.1.0-alpha.19",
-    "@sanity/client": "^7.16.0",
+    "@sanity/client": "^7.17.0",
     "@sanity/mutate": "^0.16.1",
-    "@sanity/types": "^5.13.0",
-    "@sanity/util": "^5.13.0",
+    "@sanity/types": "^5.14.0",
+    "@sanity/util": "^5.14.0",
     "arrify": "^2.0.1",
     "console-table-printer": "^2.15.0",
     "debug": "^4.4.3",
@@ -88,8 +78,9 @@
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.0",
-    "@sanity/cli-test": "^0.1.0-alpha.17",
-    "@sanity/eslint-config-cli": "^0.0.0-alpha.4",
+    "@sanity/cli-core": "^1.0.0",
+    "@sanity/cli-test": "^0.2.0",
+    "@sanity/eslint-config-cli": "^1.0.0",
     "@sanity/pkg-utils": "^10.4.8",
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.7",
@@ -106,6 +97,10 @@
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
+  },
+  "peerDependencies": {
+    "@oclif/core": "^4.8.1",
+    "@sanity/cli-core": "^1"
   },
   "packageManager": "pnpm@10.26.0",
   "engines": {
