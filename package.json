@@ -3,35 +3,24 @@
   "version": "6.0.0",
   "description": "Tooling for running data migrations on Sanity.io projects",
   "keywords": [
-    "sanity",
     "cms",
-    "headless",
-    "realtime",
     "content",
+    "headless",
     "migrate",
-    "migration"
+    "migration",
+    "realtime",
+    "sanity"
   ],
   "homepage": "https://www.sanity.io/",
   "bugs": {
     "url": "https://github.com/sanity-io/migrate/issues"
   },
+  "license": "MIT",
+  "author": "Sanity.io <hello@sanity.io>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sanity-io/migrate.git"
   },
-  "license": "MIT",
-  "author": "Sanity.io <hello@sanity.io>",
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "source": "./src/_exports/index.ts",
-      "default": "./dist/_exports/index.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "main": "./dist/_exports/index.js",
-  "types": "./dist/_exports/index.d.ts",
   "files": [
     "dist",
     "oclif.manifest.json",
@@ -41,6 +30,20 @@
     "!src/**/*.tar",
     "!src/**/*.tar.gz"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/_exports/index.js",
+  "types": "./dist/_exports/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/_exports/index.ts",
+      "default": "./dist/_exports/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "swc --delete-dir-on-start src -d dist --strip-leading-paths && pnpm run build:types",
     "postbuild": "oclif manifest",
@@ -49,19 +52,14 @@
     "coverage": "vitest run --coverage",
     "depcheck": "knip",
     "dev": "tsc --watch",
-    "format": "prettier --write .",
+    "check:format": "oxfmt --check",
+    "format": "oxfmt",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepublishOnly": "pnpm run build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "watch": "swc src -d dist --strip-leading-paths --watch"
-  },
-  "oclif": {
-    "bin": "sanity",
-    "commands": "./dist/commands",
-    "dirname": "sanity",
-    "topicSeparator": " "
   },
   "dependencies": {
     "@sanity/client": "^7.17.0",
@@ -92,8 +90,7 @@
     "eslint": "9.39.2",
     "knip": "^5.83.1",
     "oclif": "^4.22.85",
-    "prettier": "^3.8.1",
-    "prettier-plugin-packagejson": "^2.5.22",
+    "oxfmt": "^0.40.0",
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
@@ -102,11 +99,14 @@
     "@oclif/core": "^4.8.1",
     "@sanity/cli-core": "^1"
   },
-  "packageManager": "pnpm@10.26.0",
+  "oclif": {
+    "bin": "sanity",
+    "commands": "./dist/commands",
+    "dirname": "sanity",
+    "topicSeparator": " "
+  },
   "engines": {
     "node": ">=20.19 <22 || >=22.12"
   },
-  "publishConfig": {
-    "access": "public"
-  }
+  "packageManager": "pnpm@10.26.0"
 }
