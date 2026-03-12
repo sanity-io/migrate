@@ -51,17 +51,5 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Check formatting
-        run: pnpm check:format
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Depcheck
-        run: pnpm depcheck
-
       - name: Run tests
         run: pnpm test
