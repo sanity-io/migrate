@@ -80,17 +80,17 @@ pnpm build
 
 ### Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `pnpm build` | Build with SWC + generate type declarations |
-| `pnpm watch` | Watch mode (rebuilds on changes) |
-| `pnpm test` | Run tests with Vitest |
-| `pnpm coverage` | Run tests with coverage report |
-| `pnpm lint` | Lint with ESLint |
-| `pnpm lint:fix` | Lint and auto-fix |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm depcheck` | Check for unused dependencies (Knip) |
-| `pnpm format` | Format with Prettier |
+| Script           | Description                                 |
+| ---------------- | ------------------------------------------- |
+| `pnpm build`     | Build with SWC + generate type declarations |
+| `pnpm watch`     | Watch mode (rebuilds on changes)            |
+| `pnpm test`      | Run tests with Vitest                       |
+| `pnpm coverage`  | Run tests with coverage report              |
+| `pnpm lint`      | Lint with ESLint                            |
+| `pnpm lint:fix`  | Lint and auto-fix                           |
+| `pnpm typecheck` | TypeScript type checking                    |
+| `pnpm depcheck`  | Check for unused dependencies (Knip)        |
+| `pnpm format`    | Format with Prettier                        |
 
 ### Quality Checks
 
@@ -118,8 +118,8 @@ import {myFunction} from './utils/myUtil.js'
 export {myFunction}
 
 // ❌ Bad
-import myFunction from './utils/myUtil'  // Missing extension
-const x = require('./x')                 // No CommonJS
+import myFunction from './utils/myUtil' // Missing extension
+const x = require('./x') // No CommonJS
 ```
 
 ### TypeScript
@@ -272,7 +272,7 @@ import {confirm, input, select} from '@sanity/cli-core/ux'
 
 const title = await input({
   message: 'Title of migration',
-  validate: (value) => value.trim() ? true : 'Title cannot be empty',
+  validate: (value) => (value.trim() ? true : 'Title cannot be empty'),
 })
 
 const confirmed = await confirm({
@@ -309,6 +309,7 @@ Use [conventional commits](https://www.conventionalcommits.org/) format:
 ### PR Description
 
 Include:
+
 - What changed and why
 - How to test the changes
 - Any breaking changes

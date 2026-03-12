@@ -1,4 +1,4 @@
-name: Test
+name: Lint
 on:
   pull_request:
   push:
@@ -10,39 +10,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Test (node ${{ matrix.node-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        node-version: [20, 22, 24]
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
       - name: Get pnpm store directory
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-        shell: bash
 
       - name: Cache pnpm store
         uses: actions/cache@v5
         with:
           path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-node-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-node-${{ matrix.node-version }}-
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
@@ -51,5 +42,14 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Run tests
-        run: pnpm test
+      - name: Check formatting
+        run: pnpm check:format
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Depcheck
+        run: pnpm depcheck
