@@ -2,7 +2,6 @@ import path from 'node:path'
 
 import {importModule, subdebug} from '@sanity/cli-core'
 
-
 import {Migration} from '../../types.js'
 import {fileExists} from '../fileExists.js'
 import {MIGRATION_SCRIPT_EXTENSIONS, MIGRATIONS_DIRECTORY} from './constants.js'
@@ -97,7 +96,12 @@ export async function resolveMigrationScript(
 export function isLoadableMigrationScript(
   script: ResolvedMigrationScript,
 ): script is Required<ResolvedMigrationScript> {
-  if (script.mod === undefined || typeof script.mod.default !== 'object' || script.mod.default === null || Array.isArray(script.mod.default)) {
+  if (
+    script.mod === undefined ||
+    typeof script.mod.default !== 'object' ||
+    script.mod.default === null ||
+    Array.isArray(script.mod.default)
+  ) {
     return false
   }
 
