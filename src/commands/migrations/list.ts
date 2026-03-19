@@ -17,6 +17,8 @@ export class ListMigrationCommand extends SanityCommand<typeof ListMigrationComm
     },
   ]
 
+  static override hiddenAliases = ['migration:list']
+
   public async run(): Promise<void> {
     const {directory: workDir} = await this.getProjectRoot()
 

@@ -169,6 +169,7 @@ describe('using secondary stream', () => {
     const last = lastValueFrom(parse(decodeText(streamToAsyncIterator(createReader()))))
 
     expect(await first).toEqual({bar: 0, baz: 0, foo: 0})
+    await primary.cancel()
 
     expect(await last).toEqual({bar: 99, baz: 99, foo: 99})
   })
