@@ -28,7 +28,7 @@ src/
 │   └── migration/     # Migration-specific actions
 │       └── templates/ # Built-in migration templates
 ├── commands/          # oclif command definitions
-│   └── migration/     # migration:create, migration:list, migration:run
+│   └── migrations/    # migrations:create, migrations:list, migrations:run
 ├── fetch-utils/       # HTTP request utilities
 ├── fs-webstream/      # File-based stream buffering
 ├── it-utils/          # Async iterator utilities
@@ -166,7 +166,7 @@ import {describe, test, expect, afterEach, vi} from 'vitest'
 import {testCommand} from '@sanity/cli-test'
 import {MyCommand} from '../my-command.js'
 
-describe('#migration:my-command', () => {
+describe('#migrations:my-command', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
