@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.0](https://github.com/sanity-io/migrate/compare/migrate-v6.0.0...migrate-v6.1.0) (2026-03-19)
+
+
+### Features
+
+* use plural cli topic, with singular aliases ([#60](https://github.com/sanity-io/migrate/issues/60)) ([b27d810](https://github.com/sanity-io/migrate/commit/b27d810586ffc12c6c2737ce33ec9f953f0277ff))
+
+
+### Bug Fixes
+
+* remove lodash-es dependency ([#62](https://github.com/sanity-io/migrate/issues/62)) ([bdd0335](https://github.com/sanity-io/migrate/commit/bdd03358d7fbf22a40583213b3366b5c6ef285f0))
+
 ## [6.0.0](https://github.com/sanity-io/migrate/compare/migrate-v5.2.5...migrate-v6.0.0) (2026-03-10)
 
 
