@@ -49,6 +49,8 @@ export class CreateMigrationCommand extends SanityCommand<typeof CreateMigration
     },
   ]
 
+  static override hiddenAliases = ['migration:create']
+
   public async run(): Promise<void> {
     const {args} = await this.parse(CreateMigrationCommand)
     const workDir = await getMigrationRootDirectory(this.output)

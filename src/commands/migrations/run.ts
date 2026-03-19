@@ -91,6 +91,8 @@ export class RunMigrationCommand extends SanityCommand<typeof RunMigrationComman
     }),
   }
 
+  static override hiddenAliases = ['migration:run']
+
   public async run(): Promise<void> {
     const {args, flags} = await this.parse(RunMigrationCommand)
     const cliConfig = await this.getCliConfig()
