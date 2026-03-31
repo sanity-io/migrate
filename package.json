@@ -1,6 +1,6 @@
 {
   "name": "@sanity/migrate",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "Tooling for running data migrations on Sanity.io projects",
   "keywords": [
     "cms",
