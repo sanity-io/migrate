@@ -54,7 +54,7 @@ export function decode(
   filenameEncoding: BufferEncoding,
   allowUnknownFormat: boolean,
 ): TarHeader | null {
-  let typeflag = buf[156] === 0 ? 0 : buf[156]! - ZERO_OFFSET!
+  const typeflag = buf[156] === 0 ? 0 : buf[156]! - ZERO_OFFSET!
 
   let name = decodeStr(buf, 0, 100, filenameEncoding)
   const mode = decodeOct(buf, 100, 8)
@@ -89,9 +89,6 @@ export function decode(
   } else if (!allowUnknownFormat) {
     throw new Error('Invalid tar header: unknown format.')
   }
-
-  // to support old tar versions that use trailing / to indicate dirs
-  if (typeflag === 0 && name && name.at(-1) === '/') typeflag = 5
 
   return {
     devmajor,
