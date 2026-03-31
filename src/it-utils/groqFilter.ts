@@ -8,7 +8,9 @@ export function parseGroqFilter(filter: string) {
       err.message = `Failed to parse GROQ filter "${filter}": ${err.message}`
       throw err
     }
-    throw new Error(`Failed to parse GROQ filter "${filter}": ${String(err)}`)
+    throw new Error(`Failed to parse GROQ filter "${filter}": ${String(err)}`, {
+      cause: err,
+    })
   }
 }
 
