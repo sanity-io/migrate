@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.1.2](https://github.com/sanity-io/migrate/compare/migrate-v6.1.1...migrate-v6.1.2) (2026-04-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency oclif to ^4.23.0 ([#70](https://github.com/sanity-io/migrate/issues/70)) ([eb17a6f](https://github.com/sanity-io/migrate/commit/eb17a6f3804301f882bf3f7eb0bf6d643d05c365))
+* **deps:** update sanity-tooling ([#69](https://github.com/sanity-io/migrate/issues/69)) ([a128247](https://github.com/sanity-io/migrate/commit/a1282477ea796a404aabd9cc3b911bec70230c32))
+
 ## [6.1.1](https://github.com/sanity-io/migrate/compare/migrate-v6.1.0...migrate-v6.1.1) (2026-03-31)
 
 
