@@ -61,7 +61,7 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1(@swc/core@1.15.40)(chokidar@5.0.0)
       '@swc/core':
-        specifier: ^1.15.32
+        specifier: ^1.15.40
         version: 1.15.40
       '@types/debug':
         specifier: ^4.1.13
