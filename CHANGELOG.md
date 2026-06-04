@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.0](https://github.com/sanity-io/migrate/compare/migrate-v6.1.2...migrate-v7.0.0) (2026-06-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Update @sanity/cli-core peer dependency to ^2.
+
+### Features
+
+* support vite 8 ([#77](https://github.com/sanity-io/migrate/issues/77)) ([0743770](https://github.com/sanity-io/migrate/commit/074377096823772b2ef0da1603c9ed5157e26a52))
+
 ## [6.1.2](https://github.com/sanity-io/migrate/compare/migrate-v6.1.1...migrate-v6.1.2) (2026-04-30)
 
 
