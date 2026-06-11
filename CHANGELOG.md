@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.0.2](https://github.com/sanity-io/migrate/compare/migrate-v7.0.1...migrate-v7.0.2) (2026-06-11)
+
+
+### Bug Fixes
+
+* **deps:** bump sanity monorepo dependencies to 6.x ([#87](https://github.com/sanity-io/migrate/issues/87)) ([e935d31](https://github.com/sanity-io/migrate/commit/e935d31df34178bb86e0fd89cf9a0a5385dc02d5))
+
 ## [7.0.1](https://github.com/sanity-io/migrate/compare/migrate-v7.0.0...migrate-v7.0.1) (2026-06-04)
 
 
