@@ -18,11 +18,11 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0
       '@sanity/types':
-        specifier: ^5.30.0
-        version: 5.30.0(@types/react@19.2.16)
+        specifier: ^6.0.0
+        version: 6.0.0(@types/react@19.2.16)
       '@sanity/util':
-        specifier: ^5.30.0
-        version: 5.30.0(@types/react@19.2.16)
+        specifier: ^6.0.0
+        version: 6.0.0(@types/react@19.2.16)
       arrify:
         specifier: ^2.0.1
         version: 2.0.1
@@ -1844,14 +1844,14 @@ packages:
       babel-plugin-react-compiler:
         optional: true
 
-  '@sanity/types@5.30.0':
-    resolution: {integrity: sha512-ogADO7CKCjV1h4LZl2+Cu8UnMapIkDeaIzKzBrGj8LWYXOZEdbOQEVieajYoVtBit0rULcG2jsJPs1/b40CGyg==}
+  '@sanity/types@6.0.0':
+    resolution: {integrity: sha512-VnNk5Hyeytr71pei4Do4xapIObDP0ZC32ce1kLKdJRGzz93tkJZNzrAYXZld/r8j4d6TYfJlxDP+VxacTtIKKQ==}
     peerDependencies:
       '@types/react': ^19.2
 
-  '@sanity/util@5.30.0':
-    resolution: {integrity: sha512-KXNc1k9n10MFa2kPv5K9k0cYk6RfHF0JfvceeDY+v4h+ruYPKU4v5dLN/KyBryY0QEpzpTg5pC3Pwiy+yjUnag==}
-    engines: {node: '>=20.19 <22 || >=22.12'}
+  '@sanity/util@6.0.0':
+    resolution: {integrity: sha512-cSB15y4h8R/hztWlc6u44HKm/i7Urjy57ZuAUQFxJFK55+bZ8/IYpsGkD3W7nzfiFyUuCQWy3x9dfcioKJsUVQ==}
+    engines: {node: '>=22.12'}
 
   '@sanity/uuid@3.0.2':
     resolution: {integrity: sha512-vzdhqOrX7JGbMyK40KuIwwyXHm7GMLOGuYgn3xlC09e4ZVNofUO5mgezQqnRv0JAMthIRhofqs9f6ufUjMKOvw==}
@@ -6527,18 +6527,18 @@ snapshots:
       - supports-color
       - vue-tsc
 
-  '@sanity/types@5.30.0(@types/react@19.2.16)':
+  '@sanity/types@6.0.0(@types/react@19.2.16)':
     dependencies:
       '@sanity/client': 7.22.1
       '@sanity/media-library-types': 1.4.0
       '@types/react': 19.2.16
 
-  '@sanity/util@5.30.0(@types/react@19.2.16)':
+  '@sanity/util@6.0.0(@types/react@19.2.16)':
     dependencies:
       '@date-fns/tz': 1.5.0
       '@date-fns/utc': 2.1.1
       '@sanity/client': 7.22.1
-      '@sanity/types': 5.30.0(@types/react@19.2.16)
+      '@sanity/types': 6.0.0(@types/react@19.2.16)
       date-fns: 4.4.0
       rxjs: 7.8.2
     transitivePeerDependencies:

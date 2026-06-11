@@ -64,8 +64,8 @@
   "dependencies": {
     "@sanity/client": "^7.22.1",
     "@sanity/mutate": "^0.18.0",
-    "@sanity/types": "^5.30.0",
-    "@sanity/util": "^5.30.0",
+    "@sanity/types": "^6.0.0",
+    "@sanity/util": "^6.0.0",
     "arrify": "^2.0.1",
     "console-table-printer": "^2.15.0",
     "debug": "^4.4.3",
