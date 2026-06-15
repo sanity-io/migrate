@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@sanity/client": "^7.22.1",
-    "@sanity/mutate": "^0.18.0",
+    "@sanity/mutate": "^0.18.1",
     "@sanity/types": "^6.0.0",
     "@sanity/util": "^6.0.0",
     "arrify": "^2.0.1",
@@ -78,7 +78,7 @@
     "@sanity/cli-core": "^2.0.1",
     "@sanity/cli-test": "^1.0.1",
     "@sanity/eslint-config-cli": "^1.1.2",
-    "@sanity/pkg-utils": "^10.5.3",
+    "@sanity/pkg-utils": "^10.5.5",
     "@swc/cli": "^0.8.1",
     "@swc/core": "^1.15.40",
     "@types/debug": "^4.1.13",
