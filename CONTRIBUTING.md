@@ -17,18 +17,15 @@ For detailed setup, see [Development Workflow](#development-workflow).
 
 ### Overview
 
-`@sanity/migrate` provides tooling for running data migrations on [Sanity.io](https://www.sanity.io/) projects. It's built as an [oclif](https://oclif.io/) CLI with commands for creating, listing, and running migrations.
+`@sanity/migrate` is a **library** that provides the programmatic building blocks for running data migrations on [Sanity.io](https://www.sanity.io/) projects: defining migrations, building mutations, reading documents from the API or a dataset export, and executing migrations (dry run and live).
+
+It is consumed as an API — there are no CLI commands or executables in this package. The user-facing `sanity migrations create|list|run` commands live in the [Sanity CLI](https://github.com/sanity-io/cli) and call into this library's public API.
 
 ### Directory Structure
 
 ```
 src/
-├── _exports/          # Public API exports
-├── actions/           # Business logic (migration templates, resolution)
-│   └── migration/     # Migration-specific actions
-│       └── templates/ # Built-in migration templates
-├── commands/          # oclif command definitions
-│   └── migrations/    # migrations:create, migrations:list, migrations:run
+├── _exports/          # Public API surface (the package entry point)
 ├── fetch-utils/       # HTTP request utilities
 ├── fs-webstream/      # File-based stream buffering
 ├── it-utils/          # Async iterator utilities
@@ -37,28 +34,28 @@ src/
 ├── sources/           # Data sources (API, export archives)
 ├── tar-webstream/     # Tar archive streaming (for dataset exports)
 ├── uint8arrays/       # Binary data utilities
-└── utils/             # Shared utilities (constants, formatting, etc.)
+└── utils/             # Shared stream/iterator helpers
 ```
+
+Everything the package exposes is re-exported from `src/_exports/index.ts`. If something isn't exported there, it's internal.
 
 ### Separation of Concerns
 
 ```
 ┌─────────────────────────────────────┐
-│  Commands (CLI Interface)           │  Parse args, orchestrate flow
+│  Public API (_exports)              │  defineMigration, run, dryRun, builders
 ├─────────────────────────────────────┤
-│  Actions (Business Logic)           │  Templates, migration resolution
-├─────────────────────────────────────┤
-│  Runner (Execution Engine)          │  Dry run, live run, batching
+│  Runner (Execution Engine)          │  Dry run, live run, batching, progress
 ├─────────────────────────────────────┤
 │  Sources & Utilities                │  Data sources, streams, iterators
 └─────────────────────────────────────┘
 ```
 
-**Commands** (`commands/`) parse CLI arguments and flags, then orchestrate the flow. Keep these thin.
-
-**Actions** (`actions/`) contain business logic — migration templates, project root resolution, migration script discovery.
+**Public API** (`_exports/`) is the contract consumers (including the Sanity CLI) depend on. Treat changes here as potentially breaking.
 
 **Runner** (`runner/`) handles the actual migration execution — dry runs, live runs, mutation batching, and progress reporting.
+
+**Sources & utilities** (`sources/`, `fetch-utils/`, `it-utils/`, `fs-webstream/`, `tar-webstream/`) provide the document streams the runner consumes.
 
 ---
 
@@ -90,7 +87,7 @@ pnpm build
 | `pnpm lint:fix`  | Lint and auto-fix                           |
 | `pnpm typecheck` | TypeScript type checking                    |
 | `pnpm depcheck`  | Check for unused dependencies (Knip)        |
-| `pnpm format`    | Format with Prettier                        |
+| `pnpm format`    | Format with oxfmt                           |
 
 ### Quality Checks
 
@@ -130,13 +127,13 @@ const x = require('./x') // No CommonJS
 
 ### Error Handling
 
+Library code surfaces failures by throwing — let the caller (e.g. the CLI) decide how to present them:
+
 ```typescript
 try {
-  const result = await operation()
-  return result
+  return await operation()
 } catch (error) {
-  const message = error instanceof Error ? error.message : String(error)
-  this.error(`User-facing message: ${message}`, {exit: 1})
+  throw new Error(`Failed to load migration: ${(error as Error).message}`, {cause: error})
 }
 ```
 
@@ -146,7 +143,6 @@ Tests run on both **Ubuntu and Windows**. Keep these in mind:
 
 - Use `path.join()` for constructing file paths — never hardcode `/` separators
 - In test assertions, use `path.join()` or `expect.stringContaining()` with platform-aware values
-- Be aware that `styleText()` wraps values in ANSI codes — don't assert contiguous strings that span styled boundaries
 - File operations may behave differently on Windows (e.g., `EPERM` instead of `ENOENT` for locked files)
 
 ---
@@ -155,131 +151,48 @@ Tests run on both **Ubuntu and Windows**. Keep these in mind:
 
 ### Stack
 
-- **Vitest** for test runner
-- **`@sanity/cli-test`** for command testing utilities
+- **Vitest** for the test runner
 - **`vi.mock()`** for module mocking
+- Fixtures (e.g. tar archives under `__test__/fixtures/`) for stream/source tests
 
 ### Test Structure
 
-```typescript
-import {describe, test, expect, afterEach, vi} from 'vitest'
-import {testCommand} from '@sanity/cli-test'
-import {MyCommand} from '../my-command.js'
-
-describe('#migrations:my-command', () => {
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  test('success case', async () => {
-    // 1. Set up mocks
-    mockDependency.mockResolvedValue(mockData)
-
-    // 2. Execute command
-    const {stdout, stderr, error} = await testCommand(MyCommand, ['args'], {
-      mocks: defaultMocks,
-    })
-
-    // 3. Assert
-    expect(error).toBeUndefined()
-    expect(stdout).toContain('expected output')
-  })
-
-  test('error case', async () => {
-    const {error} = await testCommand(MyCommand, ['args'], {
-      mocks: defaultMocks,
-    })
-
-    expect(error?.message).toContain('Expected error')
-    expect(error?.oclif?.exit).toBe(1)
-  })
-})
-```
-
-### Mocking Patterns
-
-Use `vi.hoisted()` for mock functions and `vi.mock()` at module level:
+Tests exercise the public API and internal units directly — no command harness:
 
 ```typescript
-const mocks = vi.hoisted(() => ({
-  confirm: vi.fn(),
-  input: vi.fn(),
-  select: vi.fn(),
-}))
+import {describe, expect, test} from 'vitest'
 
-vi.mock('@sanity/cli-core/ux', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@sanity/cli-core/ux')>()
-  return {
-    ...actual,
-    confirm: mocks.confirm,
-    input: mocks.input,
-    select: mocks.select,
-  }
+import {at, collectMigrationMutations, defineMigration, setIfMissing} from '../../_exports/index.js'
+
+describe('collectMigrationMutations', () => {
+  test('produces a patch for each matching document', async () => {
+    const migration = defineMigration({
+      documentTypes: ['post'],
+      migrate: {
+        document() {
+          return at('seen', setIfMissing(true))
+        },
+      },
+      title: 'Add seen flag',
+    })
+
+    const docs = [{_id: 'post-1', _type: 'post'}]
+    const mutations = []
+    for await (const mutation of collectMigrationMutations(migration, () => docs, context)) {
+      if (mutation) mutations.push(mutation)
+    }
+
+    expect(mutations).toHaveLength(1)
+  })
 })
 ```
 
 ### Testing Guidelines
 
-- Always clear mocks in `afterEach()`
 - Test both success and error paths
-- Use `testCommand()` helper for command execution
-- Use `vi.mocked()` for type-safe mocking
-- Avoid `any` in mock types
-
----
-
-## Command Implementation
-
-### Basic Structure
-
-Commands extend `SanityCommand` from `@sanity/cli-core`:
-
-```typescript
-import {Args, Flags} from '@oclif/core'
-import {SanityCommand} from '@sanity/cli-core'
-
-export class MyCommand extends SanityCommand<typeof MyCommand> {
-  static override args = {
-    id: Args.string({
-      description: 'Migration ID',
-      required: false,
-    }),
-  }
-
-  static override description = 'What this command does'
-
-  static override flags = {
-    'dry-run': Flags.boolean({
-      allowNo: true,
-      default: true,
-      description: 'Run in dry mode',
-    }),
-  }
-
-  public async run(): Promise<void> {
-    const {args, flags} = await this.parse(MyCommand)
-    // Implementation
-  }
-}
-```
-
-### Interactive Prompts
-
-Use `@sanity/cli-core/ux` for consistent prompts:
-
-```typescript
-import {confirm, input, select} from '@sanity/cli-core/ux'
-
-const title = await input({
-  message: 'Title of migration',
-  validate: (value) => (value.trim() ? true : 'Title cannot be empty'),
-})
-
-const confirmed = await confirm({
-  message: 'Are you sure?',
-  default: false,
-})
-```
+- Prefer asserting on real behavior (produced mutations, parsed documents) over mock call counts
+- Use `vi.mocked()` for type-safe mocking; avoid `any` in mock types
+- Keep network out of unit tests — drive the runner from in-memory documents or a local export fixture
 
 ---
 
@@ -306,6 +219,8 @@ Use [conventional commits](https://www.conventionalcommits.org/) format:
 - `ci:` — CI/CD changes
 - `chore:` — maintenance
 
+Breaking changes to the public API use `feat!:` or a `BREAKING CHANGE:` footer (this drives the major version bump via release-please).
+
 ### PR Description
 
 Include:
@@ -319,7 +234,7 @@ Include:
 
 ## Supported Environments
 
-- **Node.js**: `>=20.19 <22 || >=22.12` (see `engines` in package.json)
+- **Node.js**: `>=22.12` (see `engines` in package.json)
 - **Platforms**: Linux, macOS, Windows
 - **Package manager**: pnpm
 
@@ -330,7 +245,7 @@ Include:
 - [Project README](./README.md)
 - [Sanity Documentation](https://www.sanity.io/docs)
 - [Schema and Content Migrations Guide](https://www.sanity.io/docs/schema-and-content-migrations)
-- [oclif Documentation](https://oclif.io/docs)
+- [Sanity CLI](https://github.com/sanity-io/cli) — home of the `sanity migrations` commands
 - [Vitest Documentation](https://vitest.dev/)
 
 ---
