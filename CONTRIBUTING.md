@@ -234,7 +234,7 @@ Include:
 
 ## Supported Environments
 
-- **Node.js**: `>=20.19 <22 || >=22.12` (see `engines` in package.json)
+- **Node.js**: `>=22.12` (see `engines` in package.json)
 - **Platforms**: Linux, macOS, Windows
 - **Package manager**: pnpm
 
