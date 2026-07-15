@@ -57,13 +57,6 @@
       "semanticCommitType": "fix"
     },
     {
-      "description": "Group oclif related deps in a single PR, as they often have to update together",
-      "groupName": "oclif-tooling",
-      "matchPackageNames": ["@oclif/*", "oclif"],
-      "group": {"semanticCommitType": "fix"},
-      "semanticCommitType": "fix"
-    },
-    {
       "group": {"semanticCommitType": "chore"},
       "matchDepTypes": [
         "dependencies",

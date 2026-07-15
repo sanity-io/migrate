@@ -10,7 +10,7 @@ const GNU_VER = new Uint8Array([0x20, 0x00])
 const MAGIC_OFFSET = 257
 const VERSION_OFFSET = 263
 
-export type TarEntryType =
+type TarEntryType =
   | 'block-device'
   | 'character-device'
   | 'contiguous-file'
