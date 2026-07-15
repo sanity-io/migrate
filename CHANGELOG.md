@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.0](https://github.com/sanity-io/migrate/compare/migrate-v7.0.3...migrate-v8.0.0) (2026-07-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* This module now required node 22.12 or higher to run
+
+### Features
+
+* remove bundled CLI commands, drop node 20 support ([#92](https://github.com/sanity-io/migrate/issues/92)) ([78e347b](https://github.com/sanity-io/migrate/commit/78e347b57f451a376e54b9589d64b302d320e401))
+
 ## [7.0.3](https://github.com/sanity-io/migrate/compare/migrate-v7.0.2...migrate-v7.0.3) (2026-06-15)
 
 
