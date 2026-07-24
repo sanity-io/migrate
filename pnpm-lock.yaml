@@ -30,8 +30,8 @@ importers:
         specifier: ^1.3.2
         version: 1.3.2
       groq-js:
-        specifier: ^1.30.2
-        version: 1.30.2
+        specifier: ^2.0.0
+        version: 2.0.0
       p-map:
         specifier: ^7.0.4
         version: 7.0.4
@@ -2772,9 +2772,9 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  groq-js@1.30.2:
-    resolution: {integrity: sha512-FqF7NNzBxya6Oq4VkTl9lg3W5Gjd3Cjwc6Et2OeAcTdmHOClwcYeAZkWR6wIm+KPtvESSYtzP59aj/+9egOKZQ==}
-    engines: {node: '>= 14'}
+  groq-js@2.0.0:
+    resolution: {integrity: sha512-kj56ZjnOFbgDt91zYwQ10jsVUtVGJqAKfRbAir0EvTK84O5ZsSyc0rDEm2P3jmAJkxs4X1DOG8vtaYJQIA/XCA==}
+    engines: {node: '>=22.12'}
 
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
@@ -6493,11 +6493,9 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  groq-js@1.30.2:
+  groq-js@2.0.0:
     dependencies:
-      debug: 4.4.3
-    transitivePeerDependencies:
-      - supports-color
+      obug: 2.1.3
 
   has-flag@4.0.0: {}
 
