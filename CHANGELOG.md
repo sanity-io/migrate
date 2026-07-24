@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.1](https://github.com/sanity-io/migrate/compare/migrate-v8.0.0...migrate-v8.0.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* **deps:** bump groq-js from ^1.30.2 to ^2.0.0 ([#97](https://github.com/sanity-io/migrate/issues/97)) ([b22077d](https://github.com/sanity-io/migrate/commit/b22077de9851c4070a7812c874543801ba611bfe))
+
 ## [8.0.0](https://github.com/sanity-io/migrate/compare/migrate-v7.0.3...migrate-v8.0.0) (2026-07-15)
 
 
