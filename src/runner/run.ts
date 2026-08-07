@@ -1,3 +1,5 @@
+import {randomUUID} from 'node:crypto'
+
 import {type MultipleMutationResult} from '@sanity/client'
 import {type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
@@ -38,6 +40,12 @@ import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutati
 const debug = baseDebug.extend('run')
 
 /**
+ * A transaction that is guaranteed to carry an ID we chose ourselves, so it can be looked up in the
+ * transaction log even if we never get to see the API response.
+ */
+type IdentifiedTransactionPayload = TransactionPayload & {transactionId: string}
+
+/**
  * @public
  */
 export interface MigrationRunnerConfig {
@@ -75,6 +83,21 @@ export async function* toFetchOptionsIterable(
 ) {
   for await (const transaction of mutations) {
     yield toTransactionFetchOptions(apiConfig, transaction)
+  }
+}
+
+/**
+ * Assigns an ID to every transaction that doesn't already have one. Without a client-side ID, a
+ * request that never returns leaves us with no way to name, and therefore no way to look up, the
+ * transaction it may have committed.
+ */
+async function* withTransactionIds(
+  transactions: AsyncIterableIterator<TransactionPayload>,
+): AsyncIterableIterator<IdentifiedTransactionPayload> {
+  for await (const transaction of transactions) {
+    yield transaction.transactionId === undefined
+      ? {...transaction, transactionId: randomUUID()}
+      : {...transaction, transactionId: transaction.transactionId}
   }
 }
 
@@ -161,11 +184,11 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
     lastValueFrom(parseJSON(concatStr(decodeText(await fetchAsyncIterator(opts)))))
 
   const commits = await mapAsync(
-    toFetchOptionsIterable(config.api, batches),
-    async (opts) => {
+    withTransactionIds(batches),
+    async (transaction) => {
       config.onProgress?.({...stats, pending: ++stats.pending})
       try {
-        const result = await submit(opts)
+        const result = await submit(toTransactionFetchOptions(config.api, transaction))
         stats.pending--
         // Record the commit here rather than where results are consumed: results are delivered in
         // submission order, so a transaction that commits behind a slower request that later fails

@@ -45,6 +45,13 @@ function isMutateBody(value: unknown): value is {mutations: unknown[]; transacti
   return !('transactionId' in value) || typeof value.transactionId === 'string'
 }
 
+/** Asserts and narrows in one go, so tests can use the value without a non-null assertion */
+function expectString(value: unknown): string {
+  expect(value).toEqual(expect.any(String))
+  if (typeof value !== 'string') throw new TypeError('expected a string')
+  return value
+}
+
 /** Mimics an undici client-side timeout: `TypeError: fetch failed` wrapping a code-carrying cause */
 function headersTimeoutError(): TypeError {
   const cause = new Error('Headers Timeout Error')
@@ -123,6 +130,17 @@ describe('run', () => {
     // Every transaction the server committed must be reported as committed
     expect(committed).toBeGreaterThan(0)
     expect(progress.at(-1)?.completedTransactions).toHaveLength(committed)
+  })
+
+  it('assigns a transaction id to every submitted transaction', async () => {
+    const documents = createDocuments(8)
+    const calls = stubFetch(documents, async (call) => okResponse(call.transactionId))
+
+    await run({api}, migration)
+
+    expect(calls.length).toBeGreaterThan(1)
+    const ids = calls.map((call) => expectString(call.transactionId))
+    expect(new Set(ids).size).toBe(calls.length)
   })
 
   it('decrements pending as requests settle', async () => {
