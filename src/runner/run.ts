@@ -2,6 +2,7 @@ import {type MultipleMutationResult} from '@sanity/client'
 import {type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
 
+import baseDebug from '../debug.js'
 import {endpoints} from '../fetch-utils/endpoints.js'
 import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
 import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
@@ -33,6 +34,8 @@ import {createContextClient} from './utils/createContextClient.js'
 import {createFilteredDocumentsClient} from './utils/createFilteredDocumentsClient.js'
 import {createBufferFile} from './utils/getBufferFile.js'
 import {toSanityMutations, type TransactionPayload} from './utils/toSanityMutations.js'
+
+const debug = baseDebug.extend('run')
 
 /**
  * @public
@@ -159,24 +162,35 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
 
   const commits = await mapAsync(
     toFetchOptionsIterable(config.api, batches),
-    (opts) => {
+    async (opts) => {
       config.onProgress?.({...stats, pending: ++stats.pending})
-      return submit(opts)
+      try {
+        const result = await submit(opts)
+        stats.pending--
+        // Record the commit here rather than where results are consumed: results are delivered in
+        // submission order, so a transaction that commits behind a slower request that later fails
+        // would otherwise never be reported, making committed work look uncommitted.
+        stats.completedTransactions.push(result)
+        config.onProgress?.({...stats})
+        return result
+      } catch (error) {
+        stats.pending--
+        throw error
+      }
     },
     concurrency,
   )
 
-  for await (const result of commits) {
-    stats.completedTransactions.push(result)
+  try {
+    for await (const result of commits) {
+      debug('Committed transaction %s', result.transactionId)
+    }
     config.onProgress?.({
       ...stats,
+      done: true,
     })
+  } finally {
+    // Cancel export/buffer stream, it's not needed anymore
+    abortController.abort()
   }
-  config.onProgress?.({
-    ...stats,
-    done: true,
-  })
-
-  // Cancel export/buffer stream, it's not needed anymore
-  abortController.abort()
 }
