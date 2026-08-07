@@ -6,7 +6,7 @@ import arrify from 'arrify'
 
 import baseDebug from '../debug.js'
 import {endpoints} from '../fetch-utils/endpoints.js'
-import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
+import {fetchAsyncIterator, type FetchOptions, HTTPError} from '../fetch-utils/fetchStream.js'
 import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
 import {bufferThroughFile} from '../fs-webstream/bufferThroughFile.js'
 import {concatStr} from '../it-utils/concatStr.js'
@@ -30,6 +30,7 @@ import {
   MAX_MUTATION_CONCURRENCY,
   MUTATION_ENDPOINT_MAX_BODY_SIZE,
 } from './constants.js'
+import {UnknownTransactionOutcomeError} from './errors.js'
 import {applyFilters} from './utils/applyFilters.js'
 import {batchMutations} from './utils/batchMutations.js'
 import {createContextClient} from './utils/createContextClient.js'
@@ -99,6 +100,15 @@ async function* withTransactionIds(
       ? {...transaction, transactionId: randomUUID()}
       : {...transaction, transactionId: transaction.transactionId}
   }
+}
+
+/**
+ * Whether the error tells us the API rejected the transaction, in which case we know nothing was
+ * written. Client-side timeouts, dropped connections and server errors all leave the outcome
+ * undetermined: the transaction may well have committed before we gave up on the response.
+ */
+function isRejectedByApi(error: unknown): boolean {
+  return error instanceof HTTPError && error.statusCode >= 400 && error.statusCode < 500
 }
 
 /**
@@ -183,12 +193,19 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
   const submit = async (opts: FetchOptions): Promise<MultipleMutationResult> =>
     lastValueFrom(parseJSON(concatStr(decodeText(await fetchAsyncIterator(opts)))))
 
+  // Transactions we have submitted but not heard back about. An entry is removed once the API has
+  // either confirmed the commit or rejected it. Whatever is left when the run fails is, by
+  // definition, in an unknown state.
+  const unresolvedTransactions = new Set<string>()
+
   const commits = await mapAsync(
     withTransactionIds(batches),
     async (transaction) => {
+      unresolvedTransactions.add(transaction.transactionId)
       config.onProgress?.({...stats, pending: ++stats.pending})
       try {
         const result = await submit(toTransactionFetchOptions(config.api, transaction))
+        unresolvedTransactions.delete(transaction.transactionId)
         stats.pending--
         // Record the commit here rather than where results are consumed: results are delivered in
         // submission order, so a transaction that commits behind a slower request that later fails
@@ -198,6 +215,9 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
         return result
       } catch (error) {
         stats.pending--
+        if (isRejectedByApi(error)) {
+          unresolvedTransactions.delete(transaction.transactionId)
+        }
         throw error
       }
     },
@@ -212,6 +232,15 @@ export async function run(config: MigrationRunnerConfig, migration: Migration) {
       ...stats,
       done: true,
     })
+  } catch (error) {
+    // Anything still unresolved either failed without a response, or was in flight when we gave up.
+    // Either way we can't claim it wasn't written.
+    throw unresolvedTransactions.size > 0
+      ? new UnknownTransactionOutcomeError([...unresolvedTransactions], {
+          api: config.api,
+          cause: error,
+        })
+      : error
   } finally {
     // Cancel export/buffer stream, it's not needed anymore
     abortController.abort()

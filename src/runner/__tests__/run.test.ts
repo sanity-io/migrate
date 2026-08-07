@@ -12,7 +12,7 @@ const api: APIConfig = {
   token: 'token',
 }
 
-// Big enough that batchMutations (256KB max body size) spreads the mutations over several batches
+// Big enough that batchMutations (256KB max body size) puts 4 mutations in each batch
 const FILLER = 'x'.repeat(64 * 1024)
 
 function createDocuments(count: number): SanityDocument[] {
@@ -94,7 +94,12 @@ function stubFetch(
 }
 
 function okResponse(transactionId: string | undefined): Response {
-  return Response.json({results: [], transactionId: transactionId ?? 'server-txn'}, {status: 200})
+  return Response.json(
+    {results: [], transactionId: transactionId ?? 'server-txn'},
+    {
+      status: 200,
+    },
+  )
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -141,6 +146,48 @@ describe('run', () => {
     expect(calls.length).toBeGreaterThan(1)
     const ids = calls.map((call) => expectString(call.transactionId))
     expect(new Set(ids).size).toBe(calls.length)
+  })
+
+  it('reports the outcome of a timed-out transaction as unknown, naming its transaction id', async () => {
+    const documents = createDocuments(4)
+    const calls = stubFetch(documents, async () => {
+      throw headersTimeoutError()
+    })
+
+    const [error] = await run({api}, migration).then(
+      () => [undefined],
+      (err: unknown) => [err],
+    )
+
+    expect(error).toBeInstanceOf(Error)
+    if (!(error instanceof Error)) throw new Error('expected an Error')
+
+    // Must not imply nothing was written, and must name the transaction so it can be looked up
+    expect(error.message).toMatch(/unknown/i)
+    expect(error.message).toContain(expectString(calls.at(0)?.transactionId))
+    expect(error.message).toMatch(/history/i)
+  })
+
+  it('reports a rejected transaction as not applied', async () => {
+    const documents = createDocuments(4)
+    stubFetch(documents, async () =>
+      Response.json(
+        {error: {description: 'Nope', type: 'mutationError'}},
+        {
+          status: 400,
+        },
+      ),
+    )
+
+    const [error] = await run({api}, migration).then(
+      () => [undefined],
+      (err: unknown) => [err],
+    )
+
+    expect(error).toBeInstanceOf(Error)
+    if (!(error instanceof Error)) throw new Error('expected an Error')
+    expect(error.message).toContain('Nope')
+    expect(error.message).not.toMatch(/unknown/i)
   })
 
   it('decrements pending as requests settle', async () => {
