@@ -67,13 +67,27 @@ export function bufferThroughFile(
   function createBufferedReader() {
     let totalBytesRead = 0
 
-    return async function tryReadFromBuffer(handle: FileHandle) {
-      const {buffer, bytesRead} = await handle.read(
-        new Uint8Array(CHUNK_SIZE),
-        0,
-        CHUNK_SIZE,
-        totalBytesRead,
-      )
+    return async function tryReadFromBuffer(
+      handle: FileHandle,
+    ): Promise<{buffer: Uint8Array; bytesRead: number}> {
+      let buffer: Uint8Array
+      let bytesRead: number
+      try {
+        ;({buffer, bytesRead} = await handle.read(
+          new Uint8Array(CHUNK_SIZE),
+          0,
+          CHUNK_SIZE,
+          totalBytesRead,
+        ))
+      } catch (error) {
+        if (signal?.aborted) {
+          // Aborting closes the handles, so a read that was in flight (or started) at that point
+          // fails with EBADF. That's an expected consequence of aborting, not a read error.
+          debug('Read failed after abort, treating as end of stream')
+          return {buffer: new Uint8Array(0), bytesRead: 0}
+        }
+        throw error
+      }
       if (bytesRead === 0 && !bufferDone && !signal?.aborted) {
         debug('Not enough data in buffer file, waiting for more data to be written')
         // we're waiting for more data to be written to the buffer file, try again
@@ -149,7 +163,7 @@ export function bufferThroughFile(
           throw new Error('Cannot read from closed handle')
         }
         const {buffer, bytesRead} = await readChunk(await readHandle)
-        if (bytesRead === 0 && bufferDone) {
+        if (bytesRead === 0 && (bufferDone || signal?.aborted)) {
           debug('Reader done reading from file handle')
           await onEnd()
           controller.close()
