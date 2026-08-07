@@ -44,6 +44,25 @@ export interface MigrationRunnerConfig {
   onProgress?: (event: MigrationProgress) => void
 }
 
+function toTransactionFetchOptions(
+  apiConfig: APIConfig,
+  transaction: TransactionPayload,
+): FetchOptions {
+  return toFetchOptions({
+    apiHost: apiConfig.apiHost ?? 'api.sanity.io',
+    apiVersion: apiConfig.apiVersion,
+    body: JSON.stringify(transaction),
+    endpoint: endpoints.data.mutate(apiConfig.dataset, {
+      autoGenerateArrayKeys: true,
+      returnIds: true,
+      visibility: 'async',
+    }),
+    projectId: apiConfig.projectId,
+    tag: 'sanity.migration.mutate',
+    token: apiConfig.token,
+  })
+}
+
 /**
  * @public
  */
@@ -52,19 +71,7 @@ export async function* toFetchOptionsIterable(
   mutations: AsyncIterableIterator<TransactionPayload>,
 ) {
   for await (const transaction of mutations) {
-    yield toFetchOptions({
-      apiHost: apiConfig.apiHost ?? 'api.sanity.io',
-      apiVersion: apiConfig.apiVersion,
-      body: JSON.stringify(transaction),
-      endpoint: endpoints.data.mutate(apiConfig.dataset, {
-        autoGenerateArrayKeys: true,
-        returnIds: true,
-        visibility: 'async',
-      }),
-      projectId: apiConfig.projectId,
-      tag: 'sanity.migration.mutate',
-      token: apiConfig.token,
-    })
+    yield toTransactionFetchOptions(apiConfig, transaction)
   }
 }
 
