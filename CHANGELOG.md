@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.2](https://github.com/sanity-io/migrate/compare/migrate-v8.0.1...migrate-v8.0.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **fs-webstream:** end the stream when a buffer file read is aborted ([8f5d170](https://github.com/sanity-io/migrate/commit/8f5d170445696a45a0c8cd71504ef7688caf1a57))
+* **runner:** record each transaction as it commits ([7e9960a](https://github.com/sanity-io/migrate/commit/7e9960a63db4d4bb16cc7393d2b3e6a5bd925496))
+* **runner:** report indeterminate request failures as unknown outcome ([ebfee9a](https://github.com/sanity-io/migrate/commit/ebfee9a5d06b454171d26f57a1a672690a262e65))
+* **runner:** submit every transaction with a client-generated id ([8bb8176](https://github.com/sanity-io/migrate/commit/8bb8176079ef574d8f1ef2645eeceac717ad6115))
+
 ## [8.0.1](https://github.com/sanity-io/migrate/compare/migrate-v8.0.0...migrate-v8.0.1) (2026-07-24)
 
 
