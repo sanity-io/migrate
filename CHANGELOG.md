@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.3](https://github.com/sanity-io/migrate/compare/migrate-v8.0.2...migrate-v8.0.3) (2026-09-11)
+
+
+### Bug Fixes
+
+* **deps:** update @sanity/client to 8.6.1 ([#106](https://github.com/sanity-io/migrate/issues/106)) ([15e9c80](https://github.com/sanity-io/migrate/commit/15e9c803143a2bb5f501a44362aa321d6b9f0300))
+* **deps:** update sanity-tooling ([#104](https://github.com/sanity-io/migrate/issues/104)) ([f929953](https://github.com/sanity-io/migrate/commit/f9299533aef1df751c632e575376d4f00d8725ab))
+
 ## [8.0.2](https://github.com/sanity-io/migrate/compare/migrate-v8.0.1...migrate-v8.0.2) (2026-08-10)
 
 
