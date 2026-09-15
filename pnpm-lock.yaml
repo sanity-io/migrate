@@ -23,15 +23,15 @@ importers:
       arrify:
         specifier: ^3.0.0
         version: 3.0.0
-      debug:
-        specifier: ^4.4.3
-        version: 4.4.3
       fast-fifo:
         specifier: ^1.3.2
         version: 1.3.2
       groq-js:
         specifier: ^2.0.0
         version: 2.0.0
+      obug:
+        specifier: ^3.0.0
+        version: 3.0.0
       p-map:
         specifier: ^7.0.4
         version: 7.0.6
@@ -51,9 +51,6 @@ importers:
       '@swc/core':
         specifier: ^1.15.41
         version: 1.15.47
-      '@types/debug':
-        specifier: ^4.1.13
-        version: 4.1.13
       '@types/node':
         specifier: ^25.9.3
         version: 25.9.5
@@ -1680,9 +1677,6 @@ packages:
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
-  '@types/debug@4.1.13':
-    resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
-
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
@@ -1703,9 +1697,6 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
-
-  '@types/ms@2.1.0':
-    resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
   '@types/node@25.9.5':
     resolution: {integrity: sha512-OScDchr2fwuUmWdf4kZ9h7PcJiYDVInhJizG/biAq3cAvqwYktuy/TYGGdZNMtNTFUP7rnb0NU4TUdm82kt4Rg==}
@@ -3250,6 +3241,10 @@ packages:
 
   obug@2.2.1:
     resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
+    engines: {node: '>=12.20.0'}
+
+  obug@3.0.0:
+    resolution: {integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==}
     engines: {node: '>=12.20.0'}
 
   onetime@6.0.0:
@@ -5291,10 +5286,6 @@ snapshots:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
 
-  '@types/debug@4.1.13':
-    dependencies:
-      '@types/ms': 2.1.0
-
   '@types/deep-eql@4.0.2': {}
 
   '@types/esrecurse@4.3.1': {}
@@ -5308,8 +5299,6 @@ snapshots:
   '@types/http-cache-semantics@4.2.0': {}
 
   '@types/json-schema@7.0.15': {}
-
-  '@types/ms@2.1.0': {}
 
   '@types/node@25.9.5':
     dependencies:
@@ -6839,6 +6828,8 @@ snapshots:
   obug@2.1.4: {}
 
   obug@2.2.1: {}
+
+  obug@3.0.0: {}
 
   onetime@6.0.0:
     dependencies:
