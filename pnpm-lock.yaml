@@ -26,12 +26,12 @@ importers:
       debug:
         specifier: ^4.4.3
         version: 4.4.3
-      fast-fifo:
-        specifier: ^1.3.2
-        version: 1.3.2
       groq-js:
         specifier: ^2.0.0
         version: 2.0.0
+      modern-tar:
+        specifier: ^0.8.5
+        version: 0.8.5
       p-map:
         specifier: ^7.0.4
         version: 7.0.6
@@ -3202,6 +3202,10 @@ packages:
 
   modern-ahocorasick@1.1.0:
     resolution: {integrity: sha512-sEKPVl2rM+MNVkGQt3ChdmD8YsigmXdn5NifZn6jiwn9LRJpWm8F3guhaqrJT/JOat6pwpbXEk6kv+b9DMIjsQ==}
+
+  modern-tar@0.8.5:
+    resolution: {integrity: sha512-snEhs+6G5Tjd4I7tLCDOaoln2RgE0bD19RzEKgvgK2hZ5VKy3MpLhLTZ2fWpXSTg4K2cyPwp+VHATFJhxfnOeA==}
+    engines: {node: '>=18.0.0'}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -6810,6 +6814,8 @@ snapshots:
       ufo: 1.6.4
 
   modern-ahocorasick@1.1.0: {}
+
+  modern-tar@0.8.5: {}
 
   ms@2.1.3: {}
 
