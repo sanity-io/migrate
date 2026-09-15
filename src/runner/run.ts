@@ -3,10 +3,11 @@ import {randomUUID} from 'node:crypto'
 import {type MultipleMutationResult} from '@sanity/client'
 import {type SanityDocument} from '@sanity/types'
 import arrify from 'arrify'
+import {isHttpError} from 'get-it'
 
 import baseDebug from '../debug.js'
 import {endpoints} from '../fetch-utils/endpoints.js'
-import {fetchAsyncIterator, type FetchOptions, HTTPError} from '../fetch-utils/fetchStream.js'
+import {fetchAsyncIterator, type FetchOptions} from '../fetch-utils/fetchStream.js'
 import {toFetchOptions} from '../fetch-utils/sanityRequestOptions.js'
 import {bufferThroughFile} from '../fs-webstream/bufferThroughFile.js'
 import {concatStr} from '../it-utils/concatStr.js'
@@ -108,7 +109,7 @@ async function* withTransactionIds(
  * undetermined: the transaction may well have committed before we gave up on the response.
  */
 function isRejectedByApi(error: unknown): boolean {
-  return error instanceof HTTPError && error.statusCode >= 400 && error.statusCode < 500
+  return isHttpError(error) && error.status >= 400 && error.status < 500
 }
 
 /**

@@ -34,7 +34,7 @@ function normalizeApiHost(apiHost: string) {
 
 export function toFetchOptions(req: SanityRequestOptions): FetchOptions {
   const {apiHost, apiVersion, body, endpoint, projectId, tag, token} = req
-  const requestInit: RequestInit = {
+  const requestInit: FetchOptions['init'] = {
     headers: {
       'Content-Type': 'application/json',
     },
