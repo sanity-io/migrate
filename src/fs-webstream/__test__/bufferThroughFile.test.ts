@@ -255,11 +255,13 @@ describe('cleanup', () => {
 
     const firstReader = createReader()
 
-    const first = await firstValueFrom(parse(decodeText(streamToAsyncIterator(firstReader))))
+    // Keep the parser alive so any partial JSON read ahead is preserved.
+    const records = parse(decodeText(streamToAsyncIterator(firstReader)))
+    const {value: first} = await records.next()
 
     expect(first).toEqual({bar: 0, baz: 0, foo: 0})
 
-    const second = await lastValueFrom(parse(decodeText(streamToAsyncIterator(firstReader))))
+    const second = await lastValueFrom(records)
     expect(second).toEqual({bar: 99, baz: 99, foo: 99})
 
     controller.abort()
