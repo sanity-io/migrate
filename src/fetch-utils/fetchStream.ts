@@ -1,10 +1,32 @@
+import {createRequester, type FetchInit, isHttpError} from 'get-it'
+import {createNodeFetch} from 'get-it/node'
+
 import {streamToAsyncIterator} from '../utils/streamToAsyncIterator.js'
+
+const request = createRequester({
+  as: 'stream',
+  fetch: createNodeFetch(),
+  middleware: [
+    async (options, next) => {
+      try {
+        return await next(options)
+      } catch (error) {
+        if (isHttpError(error)) {
+          error.message = errorMessage(error.status, error.statusText, error.body)
+        }
+        throw error
+      }
+    },
+  ],
+  // Large exports may take longer than the default two-minute total timeout.
+  timeout: {headers: 120_000, total: false},
+})
 
 /**
  * @public
  */
 export interface FetchOptions {
-  init: RequestInit
+  init: FetchInit
   url: string | URL
 }
 
@@ -18,42 +40,27 @@ interface ErrorResponse {
   message?: string
 }
 
-export class HTTPError extends Error {
-  statusCode: number
-
-  constructor(statusCode: number, message: string) {
-    super(message)
-    this.name = 'HTTPError'
-    this.statusCode = statusCode
+function errorMessage(status: number, statusText: string, body: unknown): string {
+  let response: ErrorResponse | null = null
+  try {
+    response = typeof body === 'string' ? JSON.parse(body) : null
+  } catch {
+    // Non-JSON errors use the HTTP status message.
   }
-}
 
-export async function assert2xx(res: Response): Promise<void> {
-  if (res.status < 200 || res.status > 299) {
-    const jsonResponse = (await res.json().catch(() => null)) as ErrorResponse | null
-
-    let message: string
-
-    if (jsonResponse?.error) {
-      if (typeof jsonResponse.error === 'object') {
-        message = jsonResponse.error.description
-          ? `${jsonResponse.error.type || res.status}: ${jsonResponse.error.description}`
-          : `${jsonResponse.error.type || res.status}: ${jsonResponse.message || 'Unknown error'}`
-      } else {
-        message = `${jsonResponse.error}: ${jsonResponse.message || ''}`
-      }
-    } else {
-      message = `HTTP Error ${res.status}: ${res.statusText}`
+  if (response?.error) {
+    if (typeof response.error === 'object') {
+      return `${response.error.type || status}: ${
+        response.error.description || response.message || 'Unknown error'
+      }`
     }
-
-    throw new HTTPError(res.status, message)
+    return `${response.error}: ${response.message || ''}`
   }
+  return `HTTP Error ${status}: ${statusText}`
 }
 
 export async function fetchStream({init, url}: FetchOptions) {
-  const response = await fetch(url, init)
-  await assert2xx(response)
-  if (response.body === null) throw new Error('No response received')
+  const response = await request({...init, url: String(url)})
   return response.body
 }
 

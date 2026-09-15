@@ -29,6 +29,9 @@ importers:
       fast-fifo:
         specifier: ^1.3.2
         version: 1.3.2
+      get-it:
+        specifier: ^9.5.4
+        version: 9.5.4(vitest@4.1.11)
       groq-js:
         specifier: ^2.0.0
         version: 2.0.0
