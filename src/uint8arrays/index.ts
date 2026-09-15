@@ -41,24 +41,3 @@ export function concatUint8Arrays(arrays: Uint8Array[], totalLength?: number) {
 
   return returnValue
 }
-
-export function areUint8ArraysEqual(a: Uint8Array, b: Uint8Array) {
-  assertUint8Array(a)
-  assertUint8Array(b)
-
-  if (a === b) {
-    return true
-  }
-
-  if (a.length !== b.length) {
-    return false
-  }
-
-  for (const [index, element] of a.entries()) {
-    if (element !== b[index]) {
-      return false
-    }
-  }
-
-  return true
-}
