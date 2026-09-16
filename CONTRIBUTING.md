@@ -32,7 +32,6 @@ src/
 ├── mutations/         # Mutation building and batching
 ├── runner/            # Migration execution engine (dry run + live)
 ├── sources/           # Data sources (API, export archives)
-├── tar-webstream/     # Tar archive streaming (for dataset exports)
 ├── uint8arrays/       # Binary data utilities
 └── utils/             # Shared stream/iterator helpers
 ```
@@ -55,7 +54,7 @@ Everything the package exposes is re-exported from `src/_exports/index.ts`. If s
 
 **Runner** (`runner/`) handles the actual migration execution — dry runs, live runs, mutation batching, and progress reporting.
 
-**Sources & utilities** (`sources/`, `fetch-utils/`, `it-utils/`, `fs-webstream/`, `tar-webstream/`) provide the document streams the runner consumes.
+**Sources & utilities** (`sources/`, `fetch-utils/`, `it-utils/`, `fs-webstream/`) provide the document streams the runner consumes.
 
 ---
 
