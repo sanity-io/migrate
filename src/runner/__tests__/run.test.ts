@@ -1,17 +1,18 @@
 import {type SanityDocument} from '@sanity/types'
-import {type MockResponseDef, streamBody, streamDelay, streamError} from 'get-it/mock'
+import {type MockResponseDef, streamBody} from 'get-it/mock'
 import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {at, patch, set} from '../../mutations/index.js'
 import {type APIConfig, type Migration, type MigrationProgress} from '../../types.js'
 import {run} from '../run.js'
 
-const {mock} = await vi.hoisted(async () => {
+const {fetchMock, mock} = await vi.hoisted(async () => {
   const {createMockFetch} = await import('get-it/mock')
-  return {mock: createMockFetch()}
+  const mock = createMockFetch()
+  return {fetchMock: vi.fn(mock.fetch), mock}
 })
 
-vi.mock('get-it/node', () => ({createNodeFetch: () => mock.fetch}))
+vi.mock('get-it/node', () => ({createNodeFetch: () => fetchMock}))
 
 const api: APIConfig = {
   apiVersion: 'v2024-01-01',
@@ -88,29 +89,56 @@ function okResponse(transactionId = 'server-txn'): MockResponseDef {
 
 describe('run', () => {
   afterEach(() => {
+    fetchMock.mockReset()
     mock.assertAllConsumed()
     mock.clear()
   })
 
   it('reports transactions that committed before another request failed', async () => {
-    // Enough documents to fill more batches than the default concurrency of 6
-    const documents = createDocuments(24)
-    stubRequests(documents)
-      .respond({body: streamBody(streamDelay(50), streamError(headersTimeoutError()))})
-      .respondPersist({...okResponse(), delay: 5})
+    const documents = createDocuments(8)
+    const failFirst = Promise.withResolvers<void>()
+    const timeout = headersTimeoutError()
+    stubRequests(documents).respondWithError(timeout).respond(okResponse('committed-txn'))
+    fetchMock
+      .mockImplementationOnce(mock.fetch) // Export request.
+      .mockImplementationOnce(async (...args) => {
+        try {
+          return await mock.fetch(...args)
+        } catch (error) {
+          // Record the first mutation request, but hold its failure until the second commits.
+          await failFirst.promise
+          throw error
+        }
+      })
 
     const progress: MigrationProgress[] = []
-    const [error] = await run({api, onProgress: (event) => progress.push(event)}, migration).then(
-      () => [undefined],
-      (err: unknown) => [err],
-    )
+    const result = run(
+      {
+        api,
+        concurrency: 2,
+        onProgress(event) {
+          progress.push({...event, completedTransactions: [...event.completedTransactions]})
+        },
+      },
+      migration,
+    ).catch((cause: unknown) => cause)
 
+    try {
+      await vi.waitFor(() => {
+        expect(progress.at(-1)?.completedTransactions).toHaveLength(1)
+      })
+    } finally {
+      // Settle the stalled request even if the progress assertion fails.
+      failFirst.resolve()
+      await result
+    }
+    const error: unknown = await result
     expect(error).toBeInstanceOf(Error)
-
-    // Every transaction the server committed must be reported as committed
-    const committed = mutateCalls().length - 1
-    expect(committed).toBeGreaterThan(0)
-    expect(progress.at(-1)?.completedTransactions).toHaveLength(committed)
+    expect(error).toMatchObject({cause: timeout, name: 'UnknownTransactionOutcomeError'})
+    expect(mutateCalls()).toHaveLength(2)
+    expect(progress.at(-1)?.completedTransactions).toEqual([
+      {results: [], transactionId: 'committed-txn'},
+    ])
   })
 
   it('assigns a transaction id to every submitted transaction', async () => {
