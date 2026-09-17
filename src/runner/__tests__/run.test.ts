@@ -1,9 +1,18 @@
 import {type SanityDocument} from '@sanity/types'
+import {type MockResponseDef, streamBody} from 'get-it/mock'
 import {afterEach, describe, expect, it, vi} from 'vitest'
 
 import {at, patch, set} from '../../mutations/index.js'
 import {type APIConfig, type Migration, type MigrationProgress} from '../../types.js'
 import {run} from '../run.js'
+
+const {fetchMock, mock} = await vi.hoisted(async () => {
+  const {createMockFetch} = await import('get-it/mock')
+  const mock = createMockFetch()
+  return {fetchMock: vi.fn(mock.fetch), mock}
+})
+
+vi.mock('get-it/node', () => ({createNodeFetch: () => fetchMock}))
 
 const api: APIConfig = {
   apiVersion: 'v2024-01-01',
@@ -34,11 +43,6 @@ const migration: Migration = {
   title: 'test migration',
 }
 
-interface MutateCall {
-  mutationCount: number
-  transactionId: string | undefined
-}
-
 function isMutateBody(value: unknown): value is {mutations: unknown[]; transactionId?: string} {
   if (typeof value !== 'object' || value === null || !('mutations' in value)) return false
   if (!Array.isArray(value.mutations)) return false
@@ -60,99 +64,98 @@ function headersTimeoutError(): TypeError {
   return new TypeError('fetch failed', {cause})
 }
 
-/**
- * Stubs `fetch` so the export endpoint streams `documents`, and each mutate request is handed to
- * `onMutate`, which decides how (and when) that request settles.
- */
-function stubFetch(
-  documents: SanityDocument[],
-  onMutate: (call: MutateCall, index: number) => Promise<Response>,
-) {
-  const calls: MutateCall[] = []
-  const fetchMock = vi.fn(async (url: string | URL, init?: RequestInit) => {
-    const href = String(url)
-    if (href.includes('/data/export/')) {
-      return new Response(documents.map((doc) => JSON.stringify(doc)).join('\n'), {status: 200})
-    }
-    if (href.includes('/data/mutate/')) {
-      const body: unknown = JSON.parse(String(init?.body))
-      if (!isMutateBody(body)) {
-        throw new Error(`Unexpected mutate request body: ${String(init?.body)}`)
-      }
-      const call: MutateCall = {
-        mutationCount: body.mutations.length,
-        transactionId: body.transactionId,
-      }
-      const index = calls.length
-      calls.push(call)
-      return onMutate(call, index)
-    }
-    throw new Error(`Unexpected request to ${href}`)
-  })
-  vi.stubGlobal('fetch', fetchMock)
-  return calls
+function stubRequests(documents: SanityDocument[]) {
+  mock
+    .on('GET', (url) => url.includes('/data/export/'))
+    .respond({
+      body: streamBody(...documents.map((doc) => `${JSON.stringify(doc)}\n`)),
+    })
+  return mock.on('POST', (url) => url.includes('/data/mutate/'))
 }
 
-function okResponse(transactionId: string | undefined): Response {
-  return Response.json(
-    {results: [], transactionId: transactionId ?? 'server-txn'},
-    {
-      status: 200,
-    },
-  )
+function mutateCalls() {
+  return mock
+    .getRequests()
+    .filter((req) => req.url.includes('/data/mutate/'))
+    .map(({body}) => {
+      if (!isMutateBody(body)) throw new Error('Unexpected mutate request body')
+      return body
+    })
 }
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+function okResponse(transactionId = 'server-txn'): MockResponseDef {
+  return {body: {results: [], transactionId}}
+}
 
 describe('run', () => {
   afterEach(() => {
-    vi.unstubAllGlobals()
+    fetchMock.mockReset()
+    mock.assertAllConsumed()
+    mock.clear()
   })
 
   it('reports transactions that committed before another request failed', async () => {
-    // Enough documents to fill more batches than the default concurrency of 6
-    const documents = createDocuments(24)
-    let committed = 0
-    stubFetch(documents, async (call, index) => {
-      if (index === 0) {
-        // The first request stalls long enough for the rest to commit, then times out client-side
-        await wait(50)
-        throw headersTimeoutError()
-      }
-      await wait(5)
-      committed++
-      return okResponse(call.transactionId)
-    })
+    const documents = createDocuments(8)
+    const failFirst = Promise.withResolvers<void>()
+    const timeout = headersTimeoutError()
+    stubRequests(documents).respondWithError(timeout).respond(okResponse('committed-txn'))
+    fetchMock
+      .mockImplementationOnce(mock.fetch) // Export request.
+      .mockImplementationOnce(async (...args) => {
+        try {
+          return await mock.fetch(...args)
+        } catch (error) {
+          // Record the first mutation request, but hold its failure until the second commits.
+          await failFirst.promise
+          throw error
+        }
+      })
 
     const progress: MigrationProgress[] = []
-    const [error] = await run({api, onProgress: (event) => progress.push(event)}, migration).then(
-      () => [undefined],
-      (err: unknown) => [err],
-    )
+    const result = run(
+      {
+        api,
+        concurrency: 2,
+        onProgress(event) {
+          progress.push({...event, completedTransactions: [...event.completedTransactions]})
+        },
+      },
+      migration,
+    ).catch((cause: unknown) => cause)
 
+    try {
+      await vi.waitFor(() => {
+        expect(progress.at(-1)?.completedTransactions).toHaveLength(1)
+      })
+    } finally {
+      // Settle the stalled request even if the progress assertion fails.
+      failFirst.resolve()
+      await result
+    }
+    const error: unknown = await result
     expect(error).toBeInstanceOf(Error)
-
-    // Every transaction the server committed must be reported as committed
-    expect(committed).toBeGreaterThan(0)
-    expect(progress.at(-1)?.completedTransactions).toHaveLength(committed)
+    expect(error).toMatchObject({cause: timeout, name: 'UnknownTransactionOutcomeError'})
+    expect(mutateCalls()).toHaveLength(2)
+    expect(progress.at(-1)?.completedTransactions).toEqual([
+      {results: [], transactionId: 'committed-txn'},
+    ])
   })
 
   it('assigns a transaction id to every submitted transaction', async () => {
     const documents = createDocuments(8)
-    const calls = stubFetch(documents, async (call) => okResponse(call.transactionId))
+    stubRequests(documents).respondPersist(okResponse())
 
     await run({api}, migration)
 
+    const calls = mutateCalls()
     expect(calls.length).toBeGreaterThan(1)
     const ids = calls.map((call) => expectString(call.transactionId))
     expect(new Set(ids).size).toBe(calls.length)
   })
 
   it('reports the outcome of a timed-out transaction as unknown, naming its transaction id', async () => {
-    const documents = createDocuments(4)
-    const calls = stubFetch(documents, async () => {
-      throw headersTimeoutError()
-    })
+    const documents = createDocuments(1)
+    stubRequests(documents).respondWithError(headersTimeoutError())
 
     const [error] = await run({api}, migration).then(
       () => [undefined],
@@ -164,20 +167,16 @@ describe('run', () => {
 
     // Must not imply nothing was written, and must name the transaction so it can be looked up
     expect(error.message).toMatch(/unknown/i)
-    expect(error.message).toContain(expectString(calls.at(0)?.transactionId))
+    expect(error.message).toContain(expectString(mutateCalls().at(0)?.transactionId))
     expect(error.message).toMatch(/history/i)
   })
 
   it('reports a rejected transaction as not applied', async () => {
-    const documents = createDocuments(4)
-    stubFetch(documents, async () =>
-      Response.json(
-        {error: {description: 'Nope', type: 'mutationError'}},
-        {
-          status: 400,
-        },
-      ),
-    )
+    const documents = createDocuments(1)
+    stubRequests(documents).respond({
+      body: {error: {description: 'Nope', type: 'mutationError'}},
+      status: 400,
+    })
 
     const [error] = await run({api}, migration).then(
       () => [undefined],
@@ -190,12 +189,23 @@ describe('run', () => {
     expect(error.message).not.toMatch(/unknown/i)
   })
 
+  it('reports server failures as unknown without retrying the mutation', async () => {
+    stubRequests(createDocuments(1)).respond({
+      body: {error: 'Service unavailable'},
+      status: 503,
+    })
+
+    const error: unknown = await run({api}, migration).catch((cause: unknown) => cause)
+    expect(error).toBeInstanceOf(Error)
+    if (!(error instanceof Error)) throw new Error('expected an Error')
+    expect(error.name).toBe('UnknownTransactionOutcomeError')
+    expect(error.cause).toMatchObject({name: 'HttpError', status: 503})
+    expect(mutateCalls()).toHaveLength(1)
+  })
+
   it('decrements pending as requests settle', async () => {
     const documents = createDocuments(8)
-    stubFetch(documents, async (call) => {
-      await wait(5)
-      return okResponse(call.transactionId)
-    })
+    stubRequests(documents).respondPersist({...okResponse(), delay: 5})
 
     const progress: MigrationProgress[] = []
     await run({api, onProgress: (event) => progress.push(event)}, migration)

@@ -13,7 +13,7 @@ const CHUNK_SIZE = 1024
  * The readable streams and can be read at any rate (but will not receive data faster than the buffer file is written to).
  * Note: by default, buffering will run to completion, and this may prevent the process from exiting after done reading from the
  * buffered streams. To stop writing to the buffer file, an AbortSignal can be provided and once it's controller aborts, the buffer file will
- * stop. After the signal is aborted, no new buffered readers can be created.
+ * stop and the file will be removed unless keepFile is set. After the signal is aborted, no new buffered readers can be created.
  *
  * @param source - The source readable stream. Will be drained as fast as possible.
  * @param filename - The filename to write to.
@@ -33,15 +33,34 @@ export function bufferThroughFile(
   // Whether the all data has been written to the buffer file.
   let bufferDone = false
 
-  signal?.addEventListener('abort', () => {
-    debug('Aborting bufferThroughFile')
-    Promise.all([
-      writeHandle && writeHandle.close(),
-      readHandle && readHandle.then((handle) => handle.close()),
-    ]).catch((error) => {
-      debug('Error closing handles on abort', error)
-    })
-  })
+  let removal: Promise<void> | undefined
+  function removeBufferFile() {
+    if (options?.keepFile === true) return
+    removal ??= unlink(filename)
+    return removal
+  }
+
+  let abortCleanup: Promise<void> | undefined
+  signal?.addEventListener(
+    'abort',
+    () => {
+      debug('Aborting bufferThroughFile')
+      abortCleanup = (async () => {
+        // An abort can arrive while open() is still pending. Wait for ownership of the file
+        // before closing it, and prevent start() from opening a read handle afterwards.
+        await ready
+        if (!writeHandle) return
+        await Promise.all([
+          writeHandle.close(),
+          readHandle && readHandle.then((handle) => handle.close()),
+        ])
+        await removeBufferFile()
+      })().catch((error) => {
+        debug('Error cleaning up buffer on abort', error)
+      })
+    },
+    {once: true},
+  )
 
   // Number of active readers. When this reaches 0, the read handle will be closed.
   let readerCount = 0
@@ -131,6 +150,10 @@ export function bufferThroughFile(
   }
   async function onReaderEnd() {
     readerCount--
+    if (signal?.aborted) {
+      await abortCleanup
+      return
+    }
     if (readerCount === 0 && readHandle) {
       const handle = readHandle
       readHandle = null
@@ -138,7 +161,7 @@ export function bufferThroughFile(
       await (await handle).close()
       if (options?.keepFile !== true) {
         debug('Removing buffer file', filename)
-        await unlink(filename)
+        await removeBufferFile()
       }
     }
   }
@@ -159,6 +182,11 @@ export function bufferThroughFile(
         await onEnd()
       },
       async pull(controller) {
+        if (signal?.aborted) {
+          await onEnd()
+          controller.close()
+          return
+        }
         if (!readHandle) {
           throw new Error('Cannot read from closed handle')
         }
@@ -178,7 +206,9 @@ export function bufferThroughFile(
         debug('Reader started reading from file handle')
         onReaderStart()
         await init()
-        await getReadHandle()
+        if (!signal?.aborted) {
+          await getReadHandle()
+        }
       },
     })
   }

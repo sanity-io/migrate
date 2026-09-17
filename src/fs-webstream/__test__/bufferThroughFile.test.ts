@@ -1,7 +1,7 @@
 import {stat} from 'node:fs/promises'
 import path from 'node:path'
 
-import {describe, expect, test} from 'vitest'
+import {describe, expect, test, vi} from 'vitest'
 
 import {firstValueFrom} from '../../it-utils/firstValueFrom.js'
 import {decodeText, parse} from '../../it-utils/index.js'
@@ -233,10 +233,11 @@ describe('cleanup', () => {
 
     await reader.cancel()
 
-    await sleep(10)
-    await expect(stat(bufferFile)).rejects.toThrow(/ENOENT|EPERM/)
+    await vi.waitFor(async () => {
+      await expect(stat(bufferFile)).rejects.toMatchObject({code: 'ENOENT'})
+    })
   })
-  test('cleans up after the abortController aborts', async () => {
+  test('cleans up after reading to the end', async () => {
     const encoder = new TextEncoder()
 
     async function* gen() {
@@ -264,9 +265,93 @@ describe('cleanup', () => {
     const second = await lastValueFrom(records)
     expect(second).toEqual({bar: 99, baz: 99, foo: 99})
 
-    controller.abort()
+    await expect(stat(bufferFile)).rejects.toMatchObject({code: 'ENOENT'})
+  })
 
-    await sleep(10)
-    await expect(stat(bufferFile)).rejects.toThrow('ENOENT')
+  test.each([1, 2])('cleans up on abort with %i paused readers', async (readerCount) => {
+    const bufferFile = getTestBufferFileName()
+    const controller = new AbortController()
+    const source = new ReadableStream<Uint8Array>({
+      start(stream) {
+        // More than a reader can prefetch, so cleanup cannot depend on another pull.
+        stream.enqueue(new Uint8Array(8192))
+        stream.close()
+      },
+    })
+    const createReader = bufferThroughFile(source, bufferFile, {signal: controller.signal})
+    const readers = Array.from({length: readerCount}, () => createReader().getReader())
+
+    try {
+      for (const reader of readers) {
+        expect((await reader.read()).done).toBe(false)
+      }
+      expect((await stat(bufferFile)).size).toBe(8192)
+      controller.abort()
+      await vi.waitFor(async () => {
+        await expect(stat(bufferFile)).rejects.toMatchObject({code: 'ENOENT'})
+      })
+      // Resuming or cancelling after abort must not try to remove the file twice.
+      for (const reader of readers) {
+        while (!(await reader.read()).done) {
+          // Drain any chunk already queued before abort.
+        }
+        await reader.cancel()
+      }
+    } finally {
+      controller.abort()
+      for (const reader of readers) {
+        await reader.cancel()
+        reader.releaseLock()
+      }
+    }
+  })
+
+  test('cleans up when aborted during initialization', async () => {
+    const bufferFile = getTestBufferFileName()
+    const controller = new AbortController()
+    const source = new ReadableStream<Uint8Array>({
+      start(stream) {
+        stream.close()
+      },
+    })
+    const stream = bufferThroughFile(source, bufferFile, {signal: controller.signal})()
+    controller.abort()
+    const reader = stream.getReader()
+    try {
+      await expect(reader.read()).resolves.toMatchObject({done: true})
+      await vi.waitFor(async () => {
+        await expect(stat(bufferFile)).rejects.toMatchObject({code: 'ENOENT'})
+      })
+    } finally {
+      await reader.cancel()
+      reader.releaseLock()
+    }
+  })
+
+  test('preserves the buffer on abort when keepFile is enabled', async () => {
+    const bufferFile = getTestBufferFileName()
+    const controller = new AbortController()
+    const source = new ReadableStream<Uint8Array>({
+      start(stream) {
+        stream.enqueue(new Uint8Array(8192))
+        stream.close()
+      },
+    })
+    const reader = bufferThroughFile(source, bufferFile, {
+      keepFile: true,
+      signal: controller.signal,
+    })().getReader()
+    try {
+      await reader.read()
+      controller.abort()
+      while (!(await reader.read()).done) {
+        // Drain any chunk already queued before abort.
+      }
+      expect((await stat(bufferFile)).size).toBe(8192)
+    } finally {
+      controller.abort()
+      await reader.cancel()
+      reader.releaseLock()
+    }
   })
 })
