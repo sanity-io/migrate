@@ -110,31 +110,44 @@ describe('run', () => {
   })
 
   it('reports transactions that committed before another request failed', async () => {
-    // Enough documents to fill more batches than the default concurrency of 6
-    const documents = createDocuments(24)
-    let committed = 0
-    stubFetch(documents, async (call, index) => {
+    const documents = createDocuments(8)
+    const failFirst = Promise.withResolvers<void>()
+    const calls = stubFetch(documents, async (call, index) => {
       if (index === 0) {
-        // The first request stalls long enough for the rest to commit, then times out client-side
-        await wait(50)
+        // Hold the first response until the second transaction is reported as committed.
+        await failFirst.promise
         throw headersTimeoutError()
       }
-      await wait(5)
-      committed++
       return okResponse(call.transactionId)
     })
 
     const progress: MigrationProgress[] = []
-    const [error] = await run({api, onProgress: (event) => progress.push(event)}, migration).then(
-      () => [undefined],
-      (err: unknown) => [err],
-    )
+    const result = run(
+      {
+        api,
+        concurrency: 2,
+        onProgress(event) {
+          progress.push({...event, completedTransactions: [...event.completedTransactions]})
+        },
+      },
+      migration,
+    ).catch((cause: unknown) => cause)
 
+    try {
+      await vi.waitFor(() => {
+        expect(progress.at(-1)?.completedTransactions).toHaveLength(1)
+      })
+    } finally {
+      // Settle the stalled request even if the progress assertion fails.
+      failFirst.resolve()
+      await result
+    }
+    const error: unknown = await result
     expect(error).toBeInstanceOf(Error)
-
-    // Every transaction the server committed must be reported as committed
-    expect(committed).toBeGreaterThan(0)
-    expect(progress.at(-1)?.completedTransactions).toHaveLength(committed)
+    expect(calls).toHaveLength(2)
+    expect(progress.at(-1)?.completedTransactions).toEqual([
+      {results: [], transactionId: calls[1]?.transactionId},
+    ])
   })
 
   it('assigns a transaction id to every submitted transaction', async () => {
