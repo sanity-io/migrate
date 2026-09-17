@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.0.4](https://github.com/sanity-io/migrate/compare/migrate-v8.0.3...migrate-v8.0.4) (2026-09-17)
+
+
+### Bug Fixes
+
+* replace debug with obug ([#108](https://github.com/sanity-io/migrate/issues/108)) ([316c40e](https://github.com/sanity-io/migrate/commit/316c40e4f9c7bbc6b7819af93c51cded6cdeb573))
+* swap internal `tar-webstream` with `modern-tar` ([#109](https://github.com/sanity-io/migrate/issues/109)) ([1093274](https://github.com/sanity-io/migrate/commit/109327499a7eea942113c44d8c017e4b912a322f))
+
 ## [8.0.3](https://github.com/sanity-io/migrate/compare/migrate-v8.0.2...migrate-v8.0.3) (2026-09-11)
 
 
