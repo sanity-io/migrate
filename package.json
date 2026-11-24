@@ -60,13 +60,13 @@
     "watch": "swc src -d dist --strip-leading-paths --watch"
   },
   "dependencies": {
-    "@sanity/client": "^8.6.2",
-    "@sanity/mutate": "^0.18.2",
-    "@sanity/types": "^6.15.0",
-    "@sanity/util": "^6.15.0",
+    "@sanity/client": "^8.17.0",
+    "@sanity/mutate": "^0.18.4",
+    "@sanity/types": "^6.25.0",
+    "@sanity/util": "^6.25.0",
     "arrify": "^3.0.0",
     "get-it": "^9.5.4",
-    "groq-js": "^2.0.0",
+    "groq-js": "^2.0.3",
     "modern-tar": "^0.8.5",
     "obug": "^3.0.0",
     "p-map": "^7.0.4"
